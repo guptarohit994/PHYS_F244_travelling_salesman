@@ -3,6 +3,10 @@
 #include <omp.h>
 #define N 5
 
+typedef enum { false, true } boolean;
+
+static const int distance[N][N]={{-1, 3, 5, 2, 8}, {3.1, -1, 9, 4.2, 6.4}, {5.1, 9.1, -1, 6.2, 6.3}, {1.3, 1.5, 7.5, 9.3, 11}};	//can't replace with N?
+
 //Linked list code from https://www.hackerearth.com/practice/data-structures/linked-list/singly-linked-list/tutorial/
 struct LinkedList{
     int data;
@@ -35,11 +39,35 @@ node addNode(node head, int value){
     return head;
 }
 
+int nodeSize(node path) {
+	int size=1;
+	node temp=path;
+	while(temp != NULL) {
+	temp=temp->next;
+	size+=1;
+	}
+	return size;
+}
+
 void printNode(node p) {
 	while(p != NULL) {
 	printf("%d\n", p->data);
 	p=p->next;
 	}
+}
+
+int pathCost(node path) {
+	node p;
+	p=path;
+	p=p->next;
+	int sum=0;
+	int tempsum;
+	while(p != NULL) {
+		tempsum=distance[p->data][(p->next)->data];
+		sum+=tempsum;
+		p=p->next;
+	}
+	return sum;
 }
 
 struct ListList{
@@ -82,9 +110,10 @@ nodeList push(nodeList head, node path){
 //if head is only 1 item does nothing
 node pop(nodeList head){
     nodeList temp,p;// declare two nodes temp and p
+	node tempNode;
     temp = createNodeList();//createNode will return a new node with data = value and next pointing to NULL.
     if(head == NULL){
-        head = temp;     //when linked list is empty
+        tempNode = NULL;     //when linked list is empty
 	printf("headnull\n");
 	//printStack(head);
     }
@@ -94,7 +123,7 @@ node pop(nodeList head){
 		temp=p;
             p = p->next;//traverse the list until p is the last node.The last node always points to NULL.
         }
-        node tempNode=p->data;
+     	tempNode=p->data;
 	temp->next=NULL;
 	
     }
@@ -103,7 +132,7 @@ node pop(nodeList head){
 
 
 void printStack(nodeList path) {
-	nodelist p;
+	nodeList p;
 	p=path;
 	p=p->next;
 	while(p != NULL) {
@@ -111,20 +140,7 @@ void printStack(nodeList path) {
 	printf("path end\n");
 	p=p->next;
 	}
-}
-
-int pathCost(node path) {
-	nodelist p;
-	p=path;
-	p=p->next;
-	int sum=0;
-	int tempsum;
-	while(p != NULL) {
-		tempsum=distance[p->data][(p->next)->data];
-		sum+=tempsum;
-		p=p->next;
-	}
-	return sum;
+	printf("\n");
 }
 
 //makes sure not going to the city you are already at
@@ -134,7 +150,7 @@ boolean feasible(node path, int city) {
 		p=p->next;
 	}
 	int last = p->data;
-	if(data != city)
+	if(last != city)
 		return true;
 	else
 		return false;
@@ -144,7 +160,7 @@ int main(int argc, char *argv[])
 {
 	//const int N=5;
 	const int start=0;
-	static const int distance[N][N]={{-1, 3, 5, 2, 8}, {3.1, -1, 9, 4.2, 6.4}, {5.1, 9.1, -1, 6.2, 6.3}, {1.3, 1.5, 7.5, 9.3, 11}};	//can't replace with N?
+	//static const int distance[N][N]={{-1, 3, 5, 2, 8}, {3.1, -1, 9, 4.2, 6.4}, {5.1, 9.1, -1, 6.2, 6.3}, {1.3, 1.5, 7.5, 9.3, 11}};	//can't replace with N?
 	nodeList stack = createNodeList();
 /*
 	stack=NULL;
@@ -171,34 +187,51 @@ int main(int argc, char *argv[])
 
 	boolean done=false;
 	int popdone=0;
-  #pragma omp parallel shared(start, distance, stack, done) private(minDist, bestPath)
+	int minDist=9999;
+	node bestPath=createNode();
+	#pragma omp parallel shared(stack, minDist, bestPath, done, popdone)
 	{
 		while(!done) {
-
-		node tempPath
-		#pragma omp critical {
-			tempPath=pop(stack);
-			popdone+=1}
-		if(tempPath->data)==-1)
-			if(popdone==1)
-				done=true;
-			else
-				popdone-=1;
-		else {
-			int i;
-			for (i=0; i<N; i++)
+			printStack(stack);
+			node tempPath;
+			#pragma omp critical
 			{
-				if(feasible(tempPath)) {
-				newPath=addNode(tempPath, i)
-					#pragma omp critical {
-						push(stack, newPath);}
-				}
+				tempPath=pop(stack);
 			}
-			popdone-=1;
-		}
+			popdone+=1;
+			if((tempPath->data)==-1) {
+				if(popdone==1)
+					done=true;
+				else
+					popdone-=1;
+			}
+			else if(nodeSize(tempPath)>=N) {
+				int tempCost=pathCost(tempPath);
+				#pragma omp critical
+				{
+					if(tempCost<minDist) {
+						minDist=tempCost;
+						bestPath=tempPath;
+					}
+				}
+				popdone-=1;
+			}
+			else {
+				int i;
+				node newPath;
+				for (i=0; i<N; i++)
+				{
+					if(feasible(tempPath, i)) {
+					newPath=addNode(tempPath, i);
+						#pragma omp critical
+						{
+							push(stack, newPath);
+						}
+					}
+				}
+				popdone-=1;
+			}
 
 		}
 	}
-}
-
 }
