@@ -196,9 +196,9 @@ boolean feasible(node path, int city) {
 
 int main(int argc, char *argv[])
 {
-	double distance[4][4]={{-1.3, 3.1, 2.1, 8.1}, {3.1, -1.1, 4.2, 6.4}, {5.1, -1.1, 6.2, 6.3}, {1.3, 7.5, 9.3, 11.1}};
+	double distance[N][N]={{-1.3, 3.1, 2.1, 8.1}, {3.1, -1.1, 4.2, 6.4}, {5.1, -1.1, 6.2, 6.3}, {1.3, 7.5, 9.3, 11.1}};
 	//distance[1][1]
-	printf("%d\n", distance[1][2]);	//array not printing correctly for some reason
+	printf("%f\n", distance[1][2]);
 	const int start=0;
 	nodeList stack = createNodeList();
 	node temp;
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
 	printNode(temp);
 	printf("newTemp is ");
 	printNode(newTemp);
-	printf("Cost is %d\n", pathCost(temp, distance));
+	printf("Cost is %f\n", pathCost(temp, distance));
 	
 	/*
 	boolean done=false;
