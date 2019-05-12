@@ -155,11 +155,16 @@ void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* st
 					if (minCost > newCost || minCost == 0.0) {
 						minCost = newCost;
 						//TODO save stack
+						//only better paths
+						cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + G[curStartPoint][j]);
+						printStack(LOW, stack);
+						cnprintf(LOW, "DFS", "---------------------------------------------------------------");
 					}
+					//all competing paths
 					competingPaths += 1;
-					cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + G[curStartPoint][j]);
-					printStack(LOW, stack);
-					cnprintf(LOW, "DFS", "---------------------------------------------------------------");
+					// cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + G[curStartPoint][j]);
+					// printStack(LOW, stack);
+					// cnprintf(LOW, "DFS", "---------------------------------------------------------------");
 				} else if (j == firstPoint) {
 					//incomplete solution
 					//skip the solution which reaches firstPoint without 
@@ -188,7 +193,7 @@ int main()
     double cpu_time_used;
 	
 	//stackSelfTest();
-	int cities = 26;
+	int cities = 5;
 	n = cities;
 	int visited[n];
 
@@ -243,8 +248,8 @@ int main()
 	// }
     char ch;
    	FILE *fp;
-    //char file_name[] = "./datasets/five_d.txt";
-    char file_name[] = "./datasets/fri26_d.txt";
+    char file_name[] = "./datasets/five_d.txt";
+    //char file_name[] = "./datasets/fri26_d.txt";
     fp = fopen(file_name, "r"); // read mode
     if (fp == NULL) {
 		printf("Error while opening the file.\n");
