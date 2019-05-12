@@ -10,17 +10,26 @@
 #define FULL 3
 #define CVERBOSE LOW
 #define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s: %s\n",caller,str) : 0);
-#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2f\n",caller,str,arg) : 0);
-#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2f:%.2f\n",caller,str,arg1,arg2) : 0);
+#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2lf\n",caller,str,arg) : 0);
+//custom print with one argument (integer)
+#define cnprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %d\n",caller,str,arg) : 0);
+//custom print with two arguments (double)
+#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2lf:%.2lf\n",caller,str,arg1,arg2) : 0);
+//custom print with first argument (integer) and second argument double
+#define cnprintfaia(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %d:%.2lf\n",caller,str,arg1,arg2) : 0);
 #define cprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s",str) : 0);
-#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %.2f",str,arg) : 0);
+#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %.2lf",str,arg) : 0);
+//custom print with an argument (integer)
+#define cprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %d",str,arg) : 0);
+//custom print with two arguments (integer)
+#define cnprintfaai(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %d:%d\n",caller,str,arg1,arg2) : 0);
 
 // A structure to represent a stack 
 struct Stack 
 { 
 	int top; 
 	unsigned capacity; 
-	double* array; 
+	int* array; 
 }; 
 
 // function to create a stack of given capacity. It initializes size of 
@@ -30,7 +39,7 @@ struct Stack* createStack(unsigned capacity)
 	struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack)); 
 	stack->capacity = capacity; 
 	stack->top = -1; 
-	stack->array = (double*) malloc(stack->capacity * sizeof(double)); 
+	stack->array = (int*) malloc(stack->capacity * sizeof(int)); 
 	return stack; 
 } 
 
@@ -48,7 +57,7 @@ void push(struct Stack* stack, int item)
 	if (isFull(stack)) 
 		return; 
 	stack->array[++stack->top] = item; 
-	cnprintfa(FULL, "push", "pushed to stack", item); 
+	cnprintfai(FULL, "push", "pushed to stack", item); 
 } 
 
 // Function to remove an item from stack. It decreases top by 1 
@@ -67,7 +76,7 @@ void printStack(int verbosity, struct Stack* stack) {
 		cprintf(verbosity,"printStack", " (empty)\n");
 	}
 	for (int i = 0; i < count; i++) {
-		cprintfa(verbosity,"printStack", "", stack->array[i]);
+		cprintfai(verbosity,"printStack", "", stack->array[i]);
 		if (i != count -1) {
 			cprintf(verbosity,"printStack", " -> ");
 		} else {
@@ -91,11 +100,11 @@ void stackSelfTest() {
 	push(stack, 30); 
 	printStack(LOW,stack);
 
-	cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
+	//cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
 	printStack(LOW,stack);
 }
 
-double G[9][9];
+double G[26][26];
 int n;    //n is no of cities
 double minCost = 0.0;
 int competingPaths = 0;
@@ -125,7 +134,7 @@ int visitedCount(int visited[]) {
 
 void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* stack, int visited[]) {
 	printStack(FULL, stack);
-	cnprintfaa(MEDIUM, "DFS", "\tcurStartPoint:costTillNow = ", curStartPoint, costTillNow);
+	cnprintfaia(MEDIUM, "DFS", "\tcurStartPoint:costTillNow = ", curStartPoint, costTillNow);
 	double accumulatedCost = 0;
 	accumulatedCost += costTillNow;
 	
@@ -177,61 +186,81 @@ int main()
 { 
 	clock_t startTime, endTime;
     double cpu_time_used;
+	
 	//stackSelfTest();
-	int cities = 9;
+	int cities = 26;
 	n = cities;
 	int visited[n];
 
 	//init
 	struct Stack* stack = createStack(n);
-	for (int i = 0; i<n; i++) {
-		for (int j = 0; j<n; j++) {
-			G[i][j] = 0.0;
-		}
-		visited[i] = 0;
-	}
+	// for (int i = 0; i<n; i++) {
+	// 	for (int j = 0; j<n; j++) {
+	// 		G[i][j] = 0.0;
+	// 	}
+	// 	visited[i] = 0;
+	// }
 
-	// 4 cities case
-	// G[0][1] = 20.0;
-	// G[0][2] = 42.0;
-	// G[0][3] = 35.0;
+	// // 4 cities case
+	// // G[0][1] = 20.0;
+	// // G[0][2] = 42.0;
+	// // G[0][3] = 35.0;
 
-	// G[1][2] = 30.0;
-	// G[1][3] = 34.0;
+	// // G[1][2] = 30.0;
+	// // G[1][3] = 34.0;
 	
-	// G[2][3] = 12.0;
+	// // G[2][3] = 12.0;
 
-	// 9 cities case
-	G[0][1] = 5.0;
-	G[0][4] = 10.0;
-	G[0][5] = 15.0;
+	// // 9 cities case
+	// G[0][1] = 5.0;
+	// G[0][4] = 10.0;
+	// G[0][5] = 15.0;
 
-	G[1][2] = 25.0;
-	G[1][3] = 5.0;
+	// G[1][2] = 25.0;
+	// G[1][3] = 5.0;
 
-	G[2][8] = 10.0;
+	// G[2][8] = 10.0;
 
-	G[3][8] = 15.0;
-	G[3][7] = 35.0;
+	// G[3][8] = 15.0;
+	// G[3][7] = 35.0;
 
-	G[4][5] = 5.0;
-	G[4][6] = 15.0;
+	// G[4][5] = 5.0;
+	// G[4][6] = 15.0;
 
-	G[5][8] = 25.0;
-	G[5][7] = 15.0;
-	G[5][6] = 10.0;
+	// G[5][8] = 25.0;
+	// G[5][7] = 15.0;
+	// G[5][6] = 10.0;
 
-	G[6][7] = 20.0;
+	// G[6][7] = 20.0;
 
-	G[7][8] = 30.0;
+	// G[7][8] = 30.0;
 
-	//replicate across the diagonal
-	for (int i = 0; i<n; i++) {
-		for (int j = i; j<n; j++) {
-			G[j][i] = G[i][j];
-		}
-	}
+	// //replicate across the diagonal
+	// for (int i = 0; i<n; i++) {
+	// 	for (int j = i; j<n; j++) {
+	// 		G[j][i] = G[i][j];
+	// 	}
+	// }
+    char ch;
+   	FILE *fp;
+    //char file_name[] = "./datasets/five_d.txt";
+    char file_name[] = "./datasets/fri26_d.txt";
+    fp = fopen(file_name, "r"); // read mode
+    if (fp == NULL) {
+		printf("Error while opening the file.\n");
+		exit(0);
+   	}
 
+   	double numberArray[n*n];
+   	for (int i = 0; i < n*n; i++){
+        fscanf(fp, "%lf", &numberArray[i] );
+    }
+   	fclose(fp);
+   	for (int i = 0; i < n*n; i++){
+   		G[i/n][i%n] = numberArray[i];
+        // printf("Number:%lf\n", numberArray[i]);
+    }
+	
 	printAdjacencyMatrix();
 
 	int start = 0;
