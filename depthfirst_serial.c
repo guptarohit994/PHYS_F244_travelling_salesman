@@ -33,8 +33,8 @@ char file_name[100];
 
 
 int handle_option(char *arg) {
-	if (!strncmp(arg,"--dataset=",9)) {
-		sscanf(arg+9,"%s", file_name); 
+	if (!strncmp(arg,"--dataset=",10)) {
+		sscanf(arg+10,"%s", file_name); 
 	} else if (!strncmp(arg,"--cities=",9)) {
 		sscanf(arg+9,"%d", &n);
 	} else {
@@ -299,8 +299,6 @@ int main(int argc, char *argv[]) {
 	// }
     char ch;
    	FILE *fp;
-    char file_name[] = "./datasets/five_d.txt";
-    //char file_name[] = "./datasets/fri26_d.txt";
     fp = fopen(file_name, "r"); // read mode
     if (fp == NULL) {
 		printf("Error while opening the file.\n");
