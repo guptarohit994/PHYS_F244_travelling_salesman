@@ -10,17 +10,17 @@
 #define FULL 3
 #define CVERBOSE LOW
 #define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s: %s\n",caller,str) : 0);
-#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %d\n",caller,str,arg) : 0);
-#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %d:%d\n",caller,str,arg1,arg2) : 0);
+#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2f\n",caller,str,arg) : 0);
+#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2f:%.2f\n",caller,str,arg1,arg2) : 0);
 #define cprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s",str) : 0);
-#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %d",str,arg) : 0);
+#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %.2f",str,arg) : 0);
 
 // A structure to represent a stack 
 struct Stack 
 { 
 	int top; 
 	unsigned capacity; 
-	int* array; 
+	double* array; 
 }; 
 
 // function to create a stack of given capacity. It initializes size of 
@@ -30,7 +30,7 @@ struct Stack* createStack(unsigned capacity)
 	struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack)); 
 	stack->capacity = capacity; 
 	stack->top = -1; 
-	stack->array = (int*) malloc(stack->capacity * sizeof(int)); 
+	stack->array = (double*) malloc(stack->capacity * sizeof(double)); 
 	return stack; 
 } 
 
@@ -95,12 +95,13 @@ void stackSelfTest() {
 	printStack(LOW,stack);
 }
 
-int G[9][9],n;    //n is no of vertices and graph is sorted in array G[10][10]
-int minCost = 0;
+double G[9][9];
+int n;    //n is no of cities
+double minCost = 0.0;
 int competingPaths = 0;
 
 void printAdjacencyMatrix() {
-	cnprintf(LOW,"printAdjacencyMatrix", "printing M");
+	cnprintf(LOW,"printAdjacencyMatrix", "printing Matrix");
 	for (int i = 0; i<n; i++) {
 		for (int j = 0; j<n; j++) {
 			cprintfa(LOW,"printAdjacencyMatrix", "\t", G[i][j]);
@@ -122,10 +123,10 @@ int visitedCount(int visited[]) {
 	return count;
 }
 
-void DFS(int curStartPoint, int costTillNow, int firstPoint, struct Stack* stack, int visited[]) {
+void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* stack, int visited[]) {
 	printStack(FULL, stack);
 	cnprintfaa(MEDIUM, "DFS", "\tcurStartPoint:costTillNow = ", curStartPoint, costTillNow);
-	int accumulatedCost = 0;
+	double accumulatedCost = 0;
 	accumulatedCost += costTillNow;
 	
 	//printf("%d ->", curStartPoint);
@@ -136,13 +137,13 @@ void DFS(int curStartPoint, int costTillNow, int firstPoint, struct Stack* stack
 	
 	for (int j=0; j<n; j++) {
 		//check if path exists
-		if (G[curStartPoint][j] != 0) {
+		if (G[curStartPoint][j] != 0.0) {
 			//if visited, check if we reached back
 			if (visited[j] == 1) {
 				if (j == firstPoint && visitedCount(visited) == n) {
 					//time to break
-					int newCost = accumulatedCost + G[curStartPoint][j];
-					if (minCost > newCost || minCost == 0) {
+					double newCost = accumulatedCost + G[curStartPoint][j];
+					if (minCost > newCost || minCost == 0.0) {
 						minCost = newCost;
 						//TODO save stack
 					}
@@ -185,46 +186,44 @@ int main()
 	struct Stack* stack = createStack(n);
 	for (int i = 0; i<n; i++) {
 		for (int j = 0; j<n; j++) {
-			G[i][j] = 0;
+			G[i][j] = 0.0;
 		}
 		visited[i] = 0;
 	}
 
 	// 4 cities case
-	// G[0][1] = 20;
-	// G[0][2] = 42;
-	// G[0][3] = 35;
+	// G[0][1] = 20.0;
+	// G[0][2] = 42.0;
+	// G[0][3] = 35.0;
 
-	// G[1][2] = 30;
-	// G[1][3] = 34;
+	// G[1][2] = 30.0;
+	// G[1][3] = 34.0;
 	
-	// G[2][3] = 12;
-	
-	// G[3][2] = 12;
+	// G[2][3] = 12.0;
 
 	// 9 cities case
-	G[0][1] = 5;
-	G[0][4] = 10;
-	G[0][5] = 15;
+	G[0][1] = 5.0;
+	G[0][4] = 10.0;
+	G[0][5] = 15.0;
 
-	G[1][2] = 25;
-	G[1][3] = 5;
+	G[1][2] = 25.0;
+	G[1][3] = 5.0;
 
-	G[2][8] = 10;
+	G[2][8] = 10.0;
 
-	G[3][8] = 15;
-	G[3][7] = 35;
+	G[3][8] = 15.0;
+	G[3][7] = 35.0;
 
-	G[4][5] = 5;
-	G[4][6] = 15;
+	G[4][5] = 5.0;
+	G[4][6] = 15.0;
 
-	G[5][8] = 25;
-	G[5][7] = 15;
-	G[5][6] = 10;
+	G[5][8] = 25.0;
+	G[5][7] = 15.0;
+	G[5][6] = 10.0;
 
-	G[6][7] = 20;
+	G[6][7] = 20.0;
 
-	G[7][8] = 30;
+	G[7][8] = 30.0;
 
 	//replicate across the diagonal
 	for (int i = 0; i<n; i++) {
@@ -245,9 +244,9 @@ int main()
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
 	printf("=====================================\n");
-	printf("Lowest Cost:%d\n", minCost);
+	printf("Lowest Cost:%.2f\n", minCost);
 	printf("There were %d possible paths.\n", competingPaths);
-	printf("\nTook %f seconds to execute\n", cpu_time_used);
+	printf("\nTook %.6f seconds to execute\n", cpu_time_used);
 
 
 	return 0; 
