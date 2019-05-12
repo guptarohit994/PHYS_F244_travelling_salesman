@@ -2,11 +2,18 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <limits.h> 
-#define CVERBOSE 1
-#define cnprintf(caller,str) ((CVERBOSE==1) ? printf("%s: %s\n",caller,str) : 0);
-#define cnprintfa(caller,str,arg) ((CVERBOSE==1) ? printf("%s: %s = %d\n",caller,str,arg) : 0);
-#define cprintf(caller,str) ((CVERBOSE==1) ? printf("%s",str) : 0);
-#define cprintfa(caller,str,arg) ((CVERBOSE==1) ? printf("%s %d",str,arg) : 0);
+#include <time.h>
+
+//verbosity levels
+#define LOW 1
+#define MEDIUM 2
+#define FULL 3
+#define CVERBOSE LOW
+#define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s: %s\n",caller,str) : 0);
+#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %d\n",caller,str,arg) : 0);
+#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %d:%d\n",caller,str,arg1,arg2) : 0);
+#define cprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s",str) : 0);
+#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %d",str,arg) : 0);
 
 // A structure to represent a stack 
 struct Stack 
@@ -41,7 +48,7 @@ void push(struct Stack* stack, int item)
 	if (isFull(stack)) 
 		return; 
 	stack->array[++stack->top] = item; 
-	cnprintfa("push", "pushed to stack", item); 
+	cnprintfa(FULL, "push", "pushed to stack", item); 
 } 
 
 // Function to remove an item from stack. It decreases top by 1 
@@ -52,55 +59,57 @@ int pop(struct Stack* stack)
 	return stack->array[stack->top--]; 
 } 
 
-void printStack(struct Stack* stack) {
-	cprintf("printStack", "Printing stack => ");
+void printStack(int verbosity, struct Stack* stack) {
+	cprintf(verbosity,"printStack", "Printing stack => ");
 	
 	int count = stack->top + 1;
 	if (count == 0) {
-		cprintf("printStack", "(empty)\n");
+		cprintf(verbosity,"printStack", " (empty)\n");
 	}
 	for (int i = 0; i < count; i++) {
-		cprintfa("printStack", "", stack->array[i]);
+		cprintfa(verbosity,"printStack", "", stack->array[i]);
 		if (i != count -1) {
-			cprintf("printStack", "-> ");
+			cprintf(verbosity,"printStack", " -> ");
 		} else {
 			if (i == stack->capacity - 1) {
-				cprintf("printStack", "(full)");
+				cprintf(verbosity,"printStack", " (full)");
 			}
-			cprintf("printStack", "\n");
+			cprintf(verbosity,"printStack", "\n");
 		}
 	}
 	
 }
 
 void stackSelfTest() {
-	cnprintf("stackSelfTest", "starting");
+	cnprintf(LOW,"stackSelfTest", "starting");
 	struct Stack* stack = createStack(3); 
-	printStack(stack);
+	printStack(LOW,stack);
 	push(stack, 10); 
-	printStack(stack);
+	printStack(LOW,stack);
 	push(stack, 20); 
-	printStack(stack);
+	printStack(LOW,stack);
 	push(stack, 30); 
-	printStack(stack);
+	printStack(LOW,stack);
 
-	cnprintfa("stackSelfTest", "popped from stack", pop(stack)); 
-	printStack(stack);
+	cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
+	printStack(LOW,stack);
 }
 
-int G[4][4],n;    //n is no of vertices and graph is sorted in array G[10][10]
+int G[9][9],n;    //n is no of vertices and graph is sorted in array G[10][10]
+int minCost = 0;
+int competingPaths = 0;
 
 void printAdjacencyMatrix() {
-	cnprintf("printGraph", "printing");
+	cnprintf(LOW,"printAdjacencyMatrix", "printing M");
 	for (int i = 0; i<n; i++) {
 		for (int j = 0; j<n; j++) {
-			cprintfa("printGraph", "", G[i][j]);
+			cprintfa(LOW,"printAdjacencyMatrix", "\t", G[i][j]);
 			if (j == n-1) {
-				cprintf("printGraph", "\n");
+				cprintf(LOW,"printAdjacencyMatrix", "\n");
 			}
 		}
 	}
-	cprintf("printGraph", "\n");
+	cprintf(LOW,"printAdjacencyMatrix", "\n");
 }
 
 int visitedCount(int visited[]) {
@@ -114,8 +123,8 @@ int visitedCount(int visited[]) {
 }
 
 void DFS(int curStartPoint, int costTillNow, int firstPoint, struct Stack* stack, int visited[]) {
-	printStack(stack);
-	printf("DFS:\tcurStartPoint:%d, costTillNow:%d\n", curStartPoint, costTillNow);
+	printStack(FULL, stack);
+	cnprintfaa(MEDIUM, "DFS", "\tcurStartPoint:costTillNow = ", curStartPoint, costTillNow);
 	int accumulatedCost = 0;
 	accumulatedCost += costTillNow;
 	
@@ -132,9 +141,15 @@ void DFS(int curStartPoint, int costTillNow, int firstPoint, struct Stack* stack
 			if (visited[j] == 1) {
 				if (j == firstPoint && visitedCount(visited) == n) {
 					//time to break
-					printf("Final cost:%d\n", accumulatedCost + G[curStartPoint][j]);
-					printStack(stack);
-					printf("---------------------------------------------------------------\n");
+					int newCost = accumulatedCost + G[curStartPoint][j];
+					if (minCost > newCost || minCost == 0) {
+						minCost = newCost;
+						//TODO save stack
+					}
+					competingPaths += 1;
+					cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + G[curStartPoint][j]);
+					printStack(LOW, stack);
+					cnprintf(LOW, "DFS", "---------------------------------------------------------------");
 				} else if (j == firstPoint) {
 					//incomplete solution
 					//skip the solution which reaches firstPoint without 
@@ -159,8 +174,10 @@ void DFS(int curStartPoint, int costTillNow, int firstPoint, struct Stack* stack
 // Driver program to test above functions 
 int main() 
 { 
+	clock_t startTime, endTime;
+    double cpu_time_used;
 	//stackSelfTest();
-	int cities = 4;
+	int cities = 9;
 	n = cities;
 	int visited[n];
 
@@ -173,33 +190,64 @@ int main()
 		visited[i] = 0;
 	}
 
-	G[0][1] = 20;
-	G[1][0] = 20;
+	// 4 cities case
+	// G[0][1] = 20;
+	// G[0][2] = 42;
+	// G[0][3] = 35;
 
+	// G[1][2] = 30;
+	// G[1][3] = 34;
+	
+	// G[2][3] = 12;
+	
+	// G[3][2] = 12;
 
-	G[0][2] = 42;
-	G[2][0] = 42;
+	// 9 cities case
+	G[0][1] = 5;
+	G[0][4] = 10;
+	G[0][5] = 15;
 
+	G[1][2] = 25;
+	G[1][3] = 5;
 
-	G[0][3] = 35;
-	G[3][0] = 35;
+	G[2][8] = 10;
 
+	G[3][8] = 15;
+	G[3][7] = 35;
 
-	G[1][2] = 30;
-	G[2][1] = 30;
+	G[4][5] = 5;
+	G[4][6] = 15;
 
+	G[5][8] = 25;
+	G[5][7] = 15;
+	G[5][6] = 10;
 
-	G[1][3] = 34;
-	G[3][1] = 34;
+	G[6][7] = 20;
 
+	G[7][8] = 30;
 
-	G[2][3] = 12;
-	G[3][2] = 12;
+	//replicate across the diagonal
+	for (int i = 0; i<n; i++) {
+		for (int j = i; j<n; j++) {
+			G[j][i] = G[i][j];
+		}
+	}
 
 	printAdjacencyMatrix();
 
 	int start = 0;
+	
+	startTime = clock();
+	
 	DFS(start, 0, start, stack, visited);
+	
+	endTime = clock();
+    cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
+
+	printf("=====================================\n");
+	printf("Lowest Cost:%d\n", minCost);
+	printf("There were %d possible paths.\n", competingPaths);
+	printf("\nTook %f seconds to execute\n", cpu_time_used);
 
 
 	return 0; 
