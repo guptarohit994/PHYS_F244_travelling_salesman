@@ -3,6 +3,7 @@
 #include <stdlib.h> 
 #include <limits.h> 
 #include <time.h>
+#include <string.h>
 
 //verbosity levels
 #define LOW 1
@@ -23,6 +24,32 @@
 #define cprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s %d",str,arg) : 0);
 //custom print with two arguments (integer)
 #define cnprintfaai(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? printf("%s: %s = %d:%d\n",caller,str,arg1,arg2) : 0);
+
+double* G;
+int n;    //n is no of cities
+double minCost = 0.0;
+int competingPaths = 0;
+char file_name[100];
+
+
+int handle_option(char *arg) {
+	if (!strncmp(arg,"--dataset=",9)) {
+		sscanf(arg+9,"%s", file_name); 
+	} else if (!strncmp(arg,"--cities=",9)) {
+		sscanf(arg+9,"%d", &n);
+	} else {
+		return 0;
+	}
+	return 1;
+}
+
+void usage() {
+	fprintf(stderr, "Usage: depthfirst_serial <options>\n");
+	fprintf(stderr, "Options:\n");
+	fprintf(stderr, "--help				Print this message\n");
+	fprintf(stderr, "--dataset=<file>	path to the file containing the intercity distance table.\n");
+	fprintf(stderr, "--cities=n 		number of cities being considered in the dataset\n");
+}
 
 // A structure to represent a stack 
 struct Stack 
@@ -104,16 +131,11 @@ void stackSelfTest() {
 	printStack(LOW,stack);
 }
 
-double G[26][26];
-int n;    //n is no of cities
-double minCost = 0.0;
-int competingPaths = 0;
-
 void printAdjacencyMatrix() {
 	cnprintf(LOW,"printAdjacencyMatrix", "printing Matrix");
 	for (int i = 0; i<n; i++) {
 		for (int j = 0; j<n; j++) {
-			cprintfa(LOW,"printAdjacencyMatrix", "\t", G[i][j]);
+			cprintfa(LOW,"printAdjacencyMatrix", "\t", *(G + (i*n) + j));
 			if (j == n-1) {
 				cprintf(LOW,"printAdjacencyMatrix", "\n");
 			}
@@ -146,23 +168,23 @@ void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* st
 	
 	for (int j=0; j<n; j++) {
 		//check if path exists
-		if (G[curStartPoint][j] != 0.0) {
+		if (*(G + (curStartPoint*n) + j) != 0.0) {
 			//if visited, check if we reached back
 			if (visited[j] == 1) {
 				if (j == firstPoint && visitedCount(visited) == n) {
 					//time to break
-					double newCost = accumulatedCost + G[curStartPoint][j];
+					double newCost = accumulatedCost + *(G + (curStartPoint*n) + j);
 					if (minCost > newCost || minCost == 0.0) {
 						minCost = newCost;
 						//TODO save stack
 						//only better paths
-						cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + G[curStartPoint][j]);
+						cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + *(G + (curStartPoint*n) + j));
 						printStack(LOW, stack);
 						cnprintf(LOW, "DFS", "---------------------------------------------------------------");
 					}
 					//all competing paths
 					competingPaths += 1;
-					// cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + G[curStartPoint][j]);
+					// cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + *(G + (curStartPoint*n) + j));
 					// printStack(LOW, stack);
 					// cnprintf(LOW, "DFS", "---------------------------------------------------------------");
 				} else if (j == firstPoint) {
@@ -177,7 +199,7 @@ void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* st
 				}
 			} else {
 				visited[j] = 1;
-				DFS(j, accumulatedCost + G[curStartPoint][j], firstPoint, stack, visited);
+				DFS(j, accumulatedCost + *(G + (curStartPoint*n) + j), firstPoint, stack, visited);
 				//restore visits
 				visited[j] = 0;
 				pop(stack);
@@ -186,25 +208,54 @@ void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* st
 	}	
 }
 
-// Driver program to test above functions 
-int main() 
-{ 
+//main starts here
+int main(int argc, char *argv[]) { 
+
+	//process command line args
+	for (int i = 1; i<argc; i++) {
+		if(!strcmp(argv[i],"--help")) {
+			usage();
+			exit(0);
+		} else if (!strncmp(argv[i],"--",2)) {
+			if (!handle_option(argv[i])) {
+				printf("Error! Unrecognized option %s\n", argv[i]);
+				usage();
+				exit(1);
+			}
+		} else {
+			//unhandled case
+			printf("Error! unhandled case\n");
+			exit(1);
+		}
+	}
+	if (!strcmp(file_name,"")) {
+		printf("Error! dataset option invalid with value:\"%s\"\n",file_name);
+		usage();
+		exit(1);
+	}
+	if (n <= 0) {
+		printf("Error! cities option invalid with value:\"%d\"\n",n);
+		usage();
+		exit(1);
+	}
+	printf("file_name:%s\n", file_name);
+	printf("n:%d\n", n);
+
 	clock_t startTime, endTime;
     double cpu_time_used;
 	
-	//stackSelfTest();
-	int cities = 5;
-	n = cities;
+	G = (double*) malloc(n * n * sizeof(double)); 
+	
 	int visited[n];
 
 	//init
 	struct Stack* stack = createStack(n);
-	// for (int i = 0; i<n; i++) {
-	// 	for (int j = 0; j<n; j++) {
-	// 		G[i][j] = 0.0;
-	// 	}
-	// 	visited[i] = 0;
-	// }
+	for (int i = 0; i<n; i++) {
+		for (int j = 0; j<n; j++) {
+			*(G + (i*n) + j) = 0.0;
+		}
+		visited[i] = 0;
+	}
 
 	// // 4 cities case
 	// // G[0][1] = 20.0;
@@ -262,7 +313,7 @@ int main()
     }
    	fclose(fp);
    	for (int i = 0; i < n*n; i++){
-   		G[i/n][i%n] = numberArray[i];
+   		*(G + i) = numberArray[i];
         // printf("Number:%lf\n", numberArray[i]);
     }
 	
@@ -280,7 +331,7 @@ int main()
 	printf("=====================================\n");
 	printf("Lowest Cost:%.2f\n", minCost);
 	printf("There were %d possible paths.\n", competingPaths);
-	printf("\nTook %.6f seconds to execute\n", cpu_time_used);
+	printf("\nTook %.10f seconds to execute\n", cpu_time_used);
 
 
 	return 0; 
