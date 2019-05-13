@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 	printNode(newTemp);
 	printf("Cost is %f\n", pathCost(temp, distance));
 	
-	/*
+	
 	boolean done=false;
 	int popdone=0;
 	int minDist=9999;
@@ -259,6 +259,6 @@ int main(int argc, char *argv[])
 			}
 
 		}
-	*/
+	
 	
 }
