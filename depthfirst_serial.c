@@ -55,7 +55,7 @@ struct Path
 {
 	int city;
 	struct Path *next;
-}
+};
 
 struct Path* createPath()
 {
@@ -108,23 +108,25 @@ void removeLastCity(struct Path *path) {
 struct Stack 
 { 
 	int top; 
-	unsigned capacity; 
+	//unsigned capacity; 
 	//int* array; 
 	struct Path *array;
+	struct Stack *next;
 }; 
 
 // function to create a stack of given capacity. It initializes size of 
 // stack as 0 
-struct Stack* createStack(unsigned capacity) 
+struct Stack* createStack() 
 { 
 	struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack));
-	stack->capacity = capacity; 
+	//stack->capacity = capacity; 
 	stack->top = -1; 
 	//stack->array = (int*) malloc(stack->capacity * sizeof(int)); 
 	stack->array=createPath();
+	stack->next=NULL;
 	return stack; 
 }
-
+/*
 // Stack is full when top is equal to the last index 
 int isFull(struct Stack* stack) 
 { return stack->top == stack->capacity - 1; } 
@@ -132,7 +134,7 @@ int isFull(struct Stack* stack)
 // Stack is empty when top is equal to -1 
 int isEmpty(struct Stack* stack) 
 { return stack->top == -1; } 
-
+*/
 // Function to add an item to stack. It increases top by 1 
 void push(struct Stack* stack, struct Path* path) 
 { 
@@ -143,8 +145,8 @@ void push(struct Stack* stack, struct Path* path)
 	while(index->next != NULL) {
 		index=index->next;
 	}
-	struct Stack *temp=createPath();
-	addCity(temp, path);
+	struct Stack *temp=createStack();
+	temp->array=path;
 	index->next=temp;
 	cnprintf(FULL, "push", "pushed to stack");
 	printPath(FULL, path);
@@ -160,9 +162,10 @@ struct Path* pop(struct Stack* stack)
 	while((index->next)->next != NULL) {
 		index=index->next;
 	}
-	struct Path *temp=index->next;
+	struct Stack *temp=index->next;
+	struct Path *path = temp->array;
 	index->next=NULL;
-	return temp;
+	return path;
 } 
 
 void printStack(int verbosity, struct Stack* stack) {
@@ -170,7 +173,7 @@ void printStack(int verbosity, struct Stack* stack) {
 	struct Stack *index=stack;
 	while(index != NULL) {
 		struct Path *temp = index->array;
-		printStack(temp);
+		printPath(verbosity, temp);
 		index=index->next;
 	}
 }
@@ -214,7 +217,7 @@ int visitedCount(int visited[]) {
 	}
 	return count;
 }
-
+/*
 void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* stack, int visited[]) {
 	printStack(FULL, stack);
 	cnprintfaia(MEDIUM, "DFS", "\tcurStartPoint:costTillNow = ", curStartPoint, costTillNow);
@@ -268,6 +271,7 @@ void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* st
 		}
 	}	
 }
+*/
 
 //main starts here
 int main(int argc, char *argv[]) { 
@@ -310,7 +314,7 @@ int main(int argc, char *argv[]) {
 	int visited[n];
 
 	//init
-	struct Stack* stack = createStack(n);
+	struct Stack* stack = createStack();
 	for (int i = 0; i<n; i++) {
 		for (int j = 0; j<n; j++) {
 			*(G + (i*n) + j) = 0.0;
