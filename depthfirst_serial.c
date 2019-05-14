@@ -64,18 +64,45 @@ struct Path* createPath()
 	path->next=NULL;
 }
 
-void printPath(struct Path* path)
+void printPath(int verbosity, struct Path* path)
 {
 	cprintf(verbosity,"printStack", "Printing path => ");
 	struct Path *index;
 	while(index != NULL) {
 		index->city;
-		cprintfai(verbosity,"printPath", "");
+		cprintfai(verbosity,"printPath", "", path->city);
 		cprintf(verbosity,"printPath", " -> ");	
 		index=index->next;
 	}
 	cprintf(verbosity,"printPath", "\n");
-}	
+}
+
+void addCity(struct Path *path, int place)
+{
+	if(path->city == -1)
+		path->city = place;
+	else {
+		struct Path *index = path;
+		while(index->next != NULL) {
+			index=index->next;
+		}
+		struct Path *temp = createPath();
+		temp->city=place;
+		index->next=temp;
+	}
+}
+
+void removeLastCity(struct Path *path) {
+	if(path->city == -1)
+		;
+	else {
+		struct Path *index = path;
+		while(index->next != NULL) {
+			index=index->next;
+		}
+		index->next=NULL;
+	}
+}
 
 // A structure to represent a stack 
 struct Stack 
@@ -96,7 +123,7 @@ struct Stack* createStack(unsigned capacity)
 	//stack->array = (int*) malloc(stack->capacity * sizeof(int)); 
 	stack->array=createPath();
 	return stack; 
-} 
+}
 
 // Stack is full when top is equal to the last index 
 int isFull(struct Stack* stack) 
@@ -119,50 +146,35 @@ void push(struct Stack* stack, struct Path* path)
 	struct Stack *temp=createPath();
 	addCity(temp, path);
 	index->next=temp;
-	//cnprintfai(FULL, "push", "pushed to stack", item);
 	cnprintf(FULL, "push", "pushed to stack");
-	printPath(path);
+	printPath(FULL, path);
 } 
 
 // Function to remove an item from stack. It decreases top by 1 
-int pop(struct Stack* stack) 
+struct Path* pop(struct Stack* stack) 
 { 
-	if (isEmpty(stack)) 
-		return INT_MIN; 
-	return stack->array[stack->top--]; 
+	//if (isEmpty(stack)) 
+	//	return INT_MIN; 
+	//return stack->array[stack->top--];
+	struct Stack *index = stack;
+	while((index->next)->next != NULL) {
+		index=index->next;
+	}
+	struct Path *temp=index->next;
+	index->next=NULL;
+	return temp;
 } 
 
 void printStack(int verbosity, struct Stack* stack) {
 	cprintf(verbosity,"printStack", "Printing stack => ");
-	/*
-	int count = stack->top + 1;
-	if (count == 0) {
-		cprintf(verbosity,"printStack", " (empty)\n");
-	}
-	*/
 	struct Stack *index=stack;
 	while(index != NULL) {
 		struct Path *temp = index->array;
-		cprintf(verbosity,"printStack", "");
 		printStack(temp);
-		cprintf(verbosity,"printStack", " -> ");
 		index=index->next;
 	}
-
-	cprintf(verbosity,"printStack", "\n");
-	for (int i = 0; i < count; i++) {
-		cprintf(verbosity,"printStack", "");
-		printStack();
-			cprintf(verbosity,"printStack", " -> ");
-		} else {
-			if (i == stack->capacity - 1) {
-				cprintf(verbosity,"printStack", " (full)");
-			}
-			cprintf(verbosity,"printStack", "\n");
-		}
-	}
-	
 }
+/*
 
 void stackSelfTest() {
 	cnprintf(LOW,"stackSelfTest", "starting");
@@ -178,6 +190,7 @@ void stackSelfTest() {
 	//cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
 	printStack(LOW,stack);
 }
+*/
 
 void printAdjacencyMatrix() {
 	cnprintf(LOW,"printAdjacencyMatrix", "printing Matrix");
@@ -369,7 +382,7 @@ int main(int argc, char *argv[]) {
 	
 	startTime = clock();
 	
-	DFS(start, 0, start, stack, visited);
+	//DFS(start, 0, start, stack, visited);
 	
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
