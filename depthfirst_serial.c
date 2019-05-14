@@ -51,22 +51,50 @@ void usage() {
 	fprintf(stderr, "--cities=n 		number of cities being considered in the dataset\n");
 }
 
+struct Path
+{
+	int city;
+	struct Path *next;
+}
+
+struct Path* createPath()
+{
+	struct Path* path = (struct Path*) malloc(sizeof(struct Path));
+	path->city=-1;
+	path->next=NULL;
+}
+
+void printPath(struct Path* path)
+{
+	cprintf(verbosity,"printStack", "Printing path => ");
+	struct Path *index;
+	while(index != NULL) {
+		index->city;
+		cprintfai(verbosity,"printPath", "");
+		cprintf(verbosity,"printPath", " -> ");	
+		index=index->next;
+	}
+	cprintf(verbosity,"printPath", "\n");
+}	
+
 // A structure to represent a stack 
 struct Stack 
 { 
 	int top; 
 	unsigned capacity; 
-	int* array; 
+	//int* array; 
+	struct Path *array;
 }; 
 
 // function to create a stack of given capacity. It initializes size of 
 // stack as 0 
 struct Stack* createStack(unsigned capacity) 
 { 
-	struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack)); 
+	struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack));
 	stack->capacity = capacity; 
 	stack->top = -1; 
-	stack->array = (int*) malloc(stack->capacity * sizeof(int)); 
+	//stack->array = (int*) malloc(stack->capacity * sizeof(int)); 
+	stack->array=createPath();
 	return stack; 
 } 
 
@@ -79,12 +107,21 @@ int isEmpty(struct Stack* stack)
 { return stack->top == -1; } 
 
 // Function to add an item to stack. It increases top by 1 
-void push(struct Stack* stack, int item) 
+void push(struct Stack* stack, struct Path* path) 
 { 
-	if (isFull(stack)) 
-		return; 
-	stack->array[++stack->top] = item; 
-	cnprintfai(FULL, "push", "pushed to stack", item); 
+	//if (isFull(stack)) 
+	//	return; 
+	//stack->array[++stack->top] = item; 
+	struct Stack *index=stack;
+	while(index->next != NULL) {
+		index=index->next;
+	}
+	struct Stack *temp=createPath();
+	addCity(temp, path);
+	index->next=temp;
+	//cnprintfai(FULL, "push", "pushed to stack", item);
+	cnprintf(FULL, "push", "pushed to stack");
+	printPath(path);
 } 
 
 // Function to remove an item from stack. It decreases top by 1 
@@ -97,14 +134,25 @@ int pop(struct Stack* stack)
 
 void printStack(int verbosity, struct Stack* stack) {
 	cprintf(verbosity,"printStack", "Printing stack => ");
-	
+	/*
 	int count = stack->top + 1;
 	if (count == 0) {
 		cprintf(verbosity,"printStack", " (empty)\n");
 	}
+	*/
+	struct Stack *index=stack;
+	while(index != NULL) {
+		struct Path *temp = index->array;
+		cprintf(verbosity,"printStack", "");
+		printStack(temp);
+		cprintf(verbosity,"printStack", " -> ");
+		index=index->next;
+	}
+
+	cprintf(verbosity,"printStack", "\n");
 	for (int i = 0; i < count; i++) {
-		cprintfai(verbosity,"printStack", "", stack->array[i]);
-		if (i != count -1) {
+		cprintf(verbosity,"printStack", "");
+		printStack();
 			cprintf(verbosity,"printStack", " -> ");
 		} else {
 			if (i == stack->capacity - 1) {
