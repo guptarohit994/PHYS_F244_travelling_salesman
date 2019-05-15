@@ -9,7 +9,7 @@
 #define LOW 1
 #define MEDIUM 2
 #define FULL 3
-#define CVERBOSE LOW
+#define CVERBOSE FULL
 #define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s: %s\n",caller,str) : 0);
 #define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2lf\n",caller,str,arg) : 0);
 //custom print with one argument (integer)
@@ -66,12 +66,12 @@ struct Path* createPath()
 
 void printPath(int verbosity, struct Path* path)
 {
-	cprintf(verbosity,"printStack", "Printing path => ");
-	struct Path *index;
+	cprintf(verbosity,"printPath", "Printing path => ");
+	struct Path *index=path;
 	while(index != NULL) {
-		index->city;
-		cprintfai(verbosity,"printPath", "", path->city);
-		cprintf(verbosity,"printPath", " -> ");	
+		cprintfai(verbosity,"printPath", "", index->city);
+		if(index->next != NULL)
+			cprintf(verbosity,"printPath", " -> ");	
 		index=index->next;
 	}
 	cprintf(verbosity,"printPath", "\n");
@@ -79,16 +79,23 @@ void printPath(int verbosity, struct Path* path)
 
 void addCity(struct Path *path, int place)
 {
-	if(path->city == -1)
+	if(path->city == -1) {
 		path->city = place;
+		cnprintfai(FULL, "addCity", "Path", path->city);
+	}
 	else {
+		cnprintf(FULL,"addCity", "");
 		struct Path *index = path;
 		while(index->next != NULL) {
+			cprintfai(FULL, "addCity", "->", index->city);
 			index=index->next;
 		}
+		cprintfai(FULL, "addCity", "->", index->city);
 		struct Path *temp = createPath();
 		temp->city=place;
 		index->next=temp;
+		cprintfai(FULL, "addCity", "->" ,index->next->city);
+		cprintf(FULL, "addCity", "\n");
 	}
 }
 
@@ -140,16 +147,22 @@ void push(struct Stack* stack, struct Path* path)
 { 
 	//if (isFull(stack)) 
 	//	return; 
-	//stack->array[++stack->top] = item; 
-	struct Stack *index=stack;
-	while(index->next != NULL) {
-		index=index->next;
+	//stack->array[++stack->top] = item;
+	if(stack->array->city==-1) {
+		stack->array=path;
 	}
-	struct Stack *temp=createStack();
-	temp->array=path;
-	index->next=temp;
+	else { 
+		struct Stack *index=stack;
+		while(index->next != NULL) {
+			index=index->next;
+		}
+		struct Stack *temp=createStack();
+		temp->array=path;
+		index->next=temp;
+	}
 	cnprintf(FULL, "push", "pushed to stack");
 	printPath(FULL, path);
+	cprintf(FULL, "push", "push end\n");
 } 
 
 // Function to remove an item from stack. It decreases top by 1 
@@ -174,26 +187,29 @@ void printStack(int verbosity, struct Stack* stack) {
 	while(index != NULL) {
 		struct Path *temp = index->array;
 		printPath(verbosity, temp);
+		cnprintf(verbosity, "printStack", "Path end\n");
 		index=index->next;
 	}
 }
-/*
+
 
 void stackSelfTest() {
 	cnprintf(LOW,"stackSelfTest", "starting");
-	struct Stack* stack = createStack(3); 
-	printStack(LOW,stack);
-	push(stack, 10); 
-	printStack(LOW,stack);
-	push(stack, 20); 
-	printStack(LOW,stack);
-	push(stack, 30); 
-	printStack(LOW,stack);
-
-	//cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
-	printStack(LOW,stack);
+	struct Stack* stack = createStack(); 
+	struct Path *path = createPath();
+	addCity(path, 10);
+	printPath(LOW, path);
+	addCity(path, 20);
+	printPath(LOW, path);
+	addCity(path, 30);
+	printPath(LOW, path);
+	addCity(path, 40);
+	printPath(LOW, path);
+	push(stack, path);
+	printStack(LOW, stack);
+//	cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
 }
-*/
+
 
 void printAdjacencyMatrix() {
 	cnprintf(LOW,"printAdjacencyMatrix", "printing Matrix");
@@ -387,7 +403,8 @@ int main(int argc, char *argv[]) {
 	startTime = clock();
 	
 	//DFS(start, 0, start, stack, visited);
-	
+	stackSelfTest();	
+
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
