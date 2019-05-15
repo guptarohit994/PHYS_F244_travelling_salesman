@@ -66,7 +66,8 @@ struct Path* createPath()
 
 void printPath(int verbosity, struct Path* path)
 {
-	cprintf(verbosity,"printPath", "Printing path => ");
+	cprintf(verbosity, "printPath", "\n");
+	cprintf(verbosity,"printPath", "Printing path => \n");
 	struct Path *index=path;
 	while(index != NULL) {
 		cprintfai(verbosity,"printPath", "", index->city);
@@ -75,10 +76,12 @@ void printPath(int verbosity, struct Path* path)
 		index=index->next;
 	}
 	cprintf(verbosity,"printPath", "\n");
+	cprintf(verbosity, "printPath", "\n");
 }
 
 void addCity(struct Path *path, int place)
 {
+	cprintf(FULL, "addCity", "\n");
 	if(path->city == -1) {
 		path->city = place;
 		cnprintfai(FULL, "addCity", "Path", path->city);
@@ -97,6 +100,7 @@ void addCity(struct Path *path, int place)
 		cprintfai(FULL, "addCity", "->" ,index->next->city);
 		cprintf(FULL, "addCity", "\n");
 	}
+	cprintf(FULL, "addCity", "\n");
 }
 
 void removeLastCity(struct Path *path) {
@@ -109,6 +113,20 @@ void removeLastCity(struct Path *path) {
 		}
 		index->next=NULL;
 	}
+}
+
+struct Path* copyPath(struct Path *path) {
+	cprintf(FULL, "copyPath", "\n");
+	cnprintf(FULL, "copyPath", "start");
+	struct Path *index = path;
+	struct Path *copy = createPath();
+	while(index != NULL) {
+		addCity(copy, index->city);
+		index=index->next;
+	}
+	cnprintf(FULL, "copyPath", "end");
+	cprintf(FULL, "copyPath", "\n");
+	return copy;
 }
 
 // A structure to represent a stack 
@@ -145,11 +163,11 @@ int isEmpty(struct Stack* stack)
 // Function to add an item to stack. It increases top by 1 
 void push(struct Stack* stack, struct Path* path) 
 { 
-	//if (isFull(stack)) 
-	//	return; 
-	//stack->array[++stack->top] = item;
+	cprintf(FULL, "push", "\n");
+	cnprintf(FULL, "push", "start");	
+	struct Path* copy = copyPath(path);
 	if(stack->array->city==-1) {
-		stack->array=path;
+		stack->array=copy;
 	}
 	else { 
 		struct Stack *index=stack;
@@ -157,39 +175,51 @@ void push(struct Stack* stack, struct Path* path)
 			index=index->next;
 		}
 		struct Stack *temp=createStack();
-		temp->array=path;
+		temp->array=copy;
 		index->next=temp;
 	}
 	cnprintf(FULL, "push", "pushed to stack");
-	printPath(FULL, path);
-	cprintf(FULL, "push", "push end\n");
+	printPath(FULL, copy);
+	cnprintf(FULL, "push", "end\n");
 } 
 
 // Function to remove an item from stack. It decreases top by 1 
 struct Path* pop(struct Stack* stack) 
 { 
-	//if (isEmpty(stack)) 
-	//	return INT_MIN; 
-	//return stack->array[stack->top--];
-	struct Stack *index = stack;
-	while((index->next)->next != NULL) {
-		index=index->next;
+	cprintf(FULL, "pop", "\n");
+	cnprintf(FULL, "pop", "start");
+	struct Path *path;
+	if(stack->next == NULL) {
+		path=stack->array;
+		stack->array = createPath();
 	}
-	struct Stack *temp=index->next;
-	struct Path *path = temp->array;
-	index->next=NULL;
+	else {	 
+		struct Stack *index = stack;
+		while((index->next)->next != NULL) {
+			index=index->next;
+		}
+		struct Stack *temp=index->next;
+		path = temp->array;
+		//TODO: flush temp from memory
+		index->next=NULL;
+	}
+	cnprintf(FULL, "pop", "popped from stack");
+	printPath(FULL, path);
+	cprintf(FULL, "pop", "pop end\n\n");
 	return path;
 } 
 
 void printStack(int verbosity, struct Stack* stack) {
-	cprintf(verbosity,"printStack", "Printing stack => ");
+	cprintf(verbosity, "printstack", "\n");
+	cprintf(verbosity,"printStack", "Printing stack => \n");
 	struct Stack *index=stack;
 	while(index != NULL) {
 		struct Path *temp = index->array;
 		printPath(verbosity, temp);
-		cnprintf(verbosity, "printStack", "Path end\n");
+		cnprintf(verbosity, "printStack", "Path end");
 		index=index->next;
 	}
+	cprintf(verbosity, "printStack", "-----Printing Stack end-----\n\n");
 }
 
 
@@ -198,16 +228,28 @@ void stackSelfTest() {
 	struct Stack* stack = createStack(); 
 	struct Path *path = createPath();
 	addCity(path, 10);
-	printPath(LOW, path);
-	addCity(path, 20);
-	printPath(LOW, path);
-	addCity(path, 30);
-	printPath(LOW, path);
-	addCity(path, 40);
-	printPath(LOW, path);
 	push(stack, path);
 	printStack(LOW, stack);
-//	cnprintfa(LOW,"stackSelfTest", "popped from stack", pop(stack)); 
+	addCity(path, 20);
+	push(stack, path);
+	printStack(LOW, stack);
+	addCity(path, 30);
+	push(stack, path);
+	printStack(LOW, stack);
+	addCity(path, 40);
+	push(stack, path);
+	printStack(LOW, stack);
+	pop(stack);
+	printStack(LOW, stack);
+	pop(stack);
+	printStack(LOW, stack);
+	pop(stack);
+	printStack(LOW, stack);
+	pop(stack);
+	printStack(LOW, stack);
+	pop(stack);
+	printStack(LOW, stack);
+	printPath(LOW, path);
 }
 
 
