@@ -79,6 +79,34 @@ void printPath(int verbosity, struct Path* path)
 	cprintf(verbosity, "printPath", "\n");
 }
 
+int pathEmpty(struct Path *path) {
+	return path->city==-1;
+}
+
+int numCities(struct Path* path) {
+	int num = 0;
+	if(pathEmpty(path))
+		;
+	else {
+		struct Path *index=path;
+		while(index != NULL) {
+			num++;
+			index=index->next;
+		}
+	}
+	return num;
+}
+
+int pathFull(struct Path *path) {
+	int num=numCities(path);
+	int full=0;
+	if(num == n+1)
+		full=1;
+	else
+		full=0;
+	return full;
+}
+
 void addCity(struct Path *path, int place)
 {
 	cprintf(FULL, "addCity", "\n");
@@ -119,29 +147,6 @@ void removeLastCity(struct Path *path) {
 	cnprintf(FULL, "removeLastCity", "end\n");
 }
 
-int pathEmpty(struct Path *path) {
-	return path->city==-1;
-}
-
-int pathFull(struct Path *path) {
-	int num=0;
-	int full=0;
-	if(pathEmpty(path))
-		;
-	else {
-		struct Path *index = path;
-		while(index != NULL) {
-			num++;
-			index=index->next;
-		}
-	}
-	if(num == n+1)
-		full=1;
-	else
-		full=0;
-	return full;
-}
-
 struct Path* copyPath(struct Path *path) {
 	cprintf(FULL, "copyPath", "\n");
 	cnprintf(FULL, "copyPath", "start");
@@ -167,16 +172,28 @@ int cost(struct Path *path) {
 }
 /*
 int feasible(struct Path *path) {
-	struct Path *index = path;
-	int feasible=0;
-	int [] visited;
-	while(index != NULL) {
-		
-		index=index->next;
+	int feasible=1;
+
+	int visited[n];
+	//init
+	for (int i = 0; i<n; i++) {
+		visited[i] = 0;
 	}
 	if(pathEmpty(path))
-		feasible=0;
-	else if 
+		feasible = 0;
+	else if {
+		struct Path *index = path;
+		while(index != NULL) {
+			if(visited[index->city]==1) {
+				if(index->city==path->city && numCities==n)
+					;
+				else
+					feasible = 0;
+			}
+			visited[index->city]=1;
+			index=index->next;
+		}
+	}
 }
 */
 // A structure to represent a stack 
