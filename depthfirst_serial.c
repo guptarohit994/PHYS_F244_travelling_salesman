@@ -104,6 +104,8 @@ void addCity(struct Path *path, int place)
 }
 
 void removeLastCity(struct Path *path) {
+	cprintf(FULL, "removeLastCity", "\n");
+	cnprintf(FULL, "removeLastCity", "start");
 	if(path->city == -1)
 		;
 	else {
@@ -113,6 +115,31 @@ void removeLastCity(struct Path *path) {
 		}
 		index->next=NULL;
 	}
+	printPath(FULL, path);
+	cnprintf(FULL, "removeLastCity", "end\n");
+}
+
+int pathEmpty(struct Path *path) {
+	return path->city==-1;
+}
+
+int pathFull(struct Path *path) {
+	int num=0;
+	int full=0;
+	if(pathEmpty(path))
+		;
+	else {
+		struct Path *index = path;
+		while(index != NULL) {
+			num++;
+			index=index->next;
+		}
+	}
+	if(num == n+1)
+		full=1;
+	else
+		full=0;
+	return full;
 }
 
 struct Path* copyPath(struct Path *path) {
@@ -129,6 +156,29 @@ struct Path* copyPath(struct Path *path) {
 	return copy;
 }
 
+int cost(struct Path *path) {
+	struct Path *index = path;
+	int cost = 0;
+	while(index->next != NULL) {
+		cost += *(G + (index->city)*n + index->next->city);
+		index=index->next;
+	}
+	return cost;
+}
+/*
+int feasible(struct Path *path) {
+	struct Path *index = path;
+	int feasible=0;
+	int [] visited;
+	while(index != NULL) {
+		
+		index=index->next;
+	}
+	if(pathEmpty(path))
+		feasible=0;
+	else if 
+}
+*/
 // A structure to represent a stack 
 struct Stack 
 { 
@@ -155,18 +205,18 @@ struct Stack* createStack()
 // Stack is full when top is equal to the last index 
 int isFull(struct Stack* stack) 
 { return stack->top == stack->capacity - 1; } 
-
+*/
 // Stack is empty when top is equal to -1 
 int isEmpty(struct Stack* stack) 
-{ return stack->top == -1; } 
-*/
+{ return stack->array->city == -1; } 
+
 // Function to add an item to stack. It increases top by 1 
 void push(struct Stack* stack, struct Path* path) 
 { 
 	cprintf(FULL, "push", "\n");
 	cnprintf(FULL, "push", "start");	
 	struct Path* copy = copyPath(path);
-	if(stack->array->city==-1) {
+	if(isEmpty(stack)) {
 		stack->array=copy;
 	}
 	else { 
@@ -250,6 +300,11 @@ void stackSelfTest() {
 	pop(stack);
 	printStack(LOW, stack);
 	printPath(LOW, path);
+	removeLastCity(path);
+	removeLastCity(path);
+	removeLastCity(path);
+	removeLastCity(path);
+	removeLastCity(path);
 }
 
 
@@ -275,61 +330,35 @@ int visitedCount(int visited[]) {
 	}
 	return count;
 }
-/*
-void DFS(int curStartPoint, double costTillNow, int firstPoint, struct Stack* stack, int visited[]) {
-	printStack(FULL, stack);
-	cnprintfaia(MEDIUM, "DFS", "\tcurStartPoint:costTillNow = ", curStartPoint, costTillNow);
-	double accumulatedCost = 0;
-	accumulatedCost += costTillNow;
-	
-	//printf("%d ->", curStartPoint);
-	push(stack,curStartPoint);
-	if (curStartPoint == firstPoint) {
-		visited[curStartPoint] = 1;
-	}
-	
-	for (int j=0; j<n; j++) {
-		//check if path exists
-		if (*(G + (curStartPoint*n) + j) != 0.0) {
-			//if visited, check if we reached back
-			if (visited[j] == 1) {
-				if (j == firstPoint && visitedCount(visited) == n) {
-					//time to break
-					double newCost = accumulatedCost + *(G + (curStartPoint*n) + j);
-					if (minCost > newCost || minCost == 0.0) {
-						minCost = newCost;
-						//TODO save stack
-						//only better paths
-						cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + *(G + (curStartPoint*n) + j));
-						printStack(LOW, stack);
-						cnprintf(LOW, "DFS", "---------------------------------------------------------------");
-					}
-					//all competing paths
-					competingPaths += 1;
-					// cnprintfa(LOW, "DFS", "Final cost:", accumulatedCost + *(G + (curStartPoint*n) + j));
-					// printStack(LOW, stack);
-					// cnprintf(LOW, "DFS", "---------------------------------------------------------------");
-				} else if (j == firstPoint) {
-					//incomplete solution
-					//skip the solution which reaches firstPoint without 
-					//going through all other points
-					continue;
-				} else {
-					//wrong direction
-					//we have already visited this non-firstPoint
-					continue;
+
+void DFS(double costTillNow, int firstPoint, int visited[]) {
+	struct Stack* stack = createStack();
+	struct Path* path = createPath();
+	addCity(path, firstPoint);
+	push(stack, path);
+	int minCost=0;
+	while(!isEmpty(stack)) {
+		printStack(FULL, stack);
+		path = pop(stack);
+		cnprintfai(MEDIUM, "DFS", "\tcostTillNow = ", cost(path));
+		for(int i = 0; i<n; i++) {
+			addCity(path, i);
+			if(feasible(path)) {
+				if(pathFull(path)) {
+					minCost=cost(path);
+					cnprintfa(LOW, "DFS", "Final cost:", minCost);
+					printStack(LOW, stack);
+					cnprintf(LOW, "DFS", "---------------------------------------------------------------");
+
 				}
-			} else {
-				visited[j] = 1;
-				DFS(j, accumulatedCost + *(G + (curStartPoint*n) + j), firstPoint, stack, visited);
-				//restore visits
-				visited[j] = 0;
-				pop(stack);
+				else {
+					push(stack, path);
+				}
 			}
+			removeLastCity(path);
 		}
-	}	
+	}
 }
-*/
 
 //main starts here
 int main(int argc, char *argv[]) { 
