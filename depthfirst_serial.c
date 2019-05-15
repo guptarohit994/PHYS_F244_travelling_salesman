@@ -51,19 +51,23 @@ void usage() {
 	fprintf(stderr, "--cities=n 		number of cities being considered in the dataset\n");
 }
 
+//Linked List of path taken
 struct Path
 {
 	int city;
 	struct Path *next;
 };
 
+//initializes city to -1. empty path is when city is -1
 struct Path* createPath()
 {
 	struct Path* path = (struct Path*) malloc(sizeof(struct Path));
 	path->city=-1;
 	path->next=NULL;
+	return path;
 }
 
+//prints path if CVERBOSE >= verbosity
 void printPath(int verbosity, struct Path* path)
 {
 	cprintf(verbosity, "printPath", "\n");
@@ -79,10 +83,12 @@ void printPath(int verbosity, struct Path* path)
 	cprintf(verbosity, "printPath", "\n");
 }
 
+//if path is empty
 int pathEmpty(struct Path *path) {
 	return path->city==-1;
 }
 
+//returns # of cities
 int numCities(struct Path* path) {
 	int num = 0;
 	if(pathEmpty(path))
@@ -97,6 +103,7 @@ int numCities(struct Path* path) {
 	return num;
 }
 
+//checks if path contains n+1 cities
 int pathFull(struct Path *path) {
 	int num=numCities(path);
 	int full=0;
@@ -107,6 +114,7 @@ int pathFull(struct Path *path) {
 	return full;
 }
 
+//appends a city to path
 void addCity(struct Path *path, int place)
 {
 	cprintf(FULL, "addCity", "\n");
@@ -131,6 +139,7 @@ void addCity(struct Path *path, int place)
 	cprintf(FULL, "addCity", "\n");
 }
 
+//removes the last city from path
 void removeLastCity(struct Path *path) {
 	cprintf(FULL, "removeLastCity", "\n");
 	cnprintf(FULL, "removeLastCity", "start");
@@ -147,6 +156,7 @@ void removeLastCity(struct Path *path) {
 	cnprintf(FULL, "removeLastCity", "end\n");
 }
 
+//copies a path variable. copy has different address but same element values
 struct Path* copyPath(struct Path *path) {
 	cprintf(FULL, "copyPath", "\n");
 	cnprintf(FULL, "copyPath", "start");
@@ -161,17 +171,22 @@ struct Path* copyPath(struct Path *path) {
 	return copy;
 }
 
-int cost(struct Path *path) {
+//prints cost of traversing the path
+double cost(struct Path *path) {
 	struct Path *index = path;
-	int cost = 0;
+	double cost = 0;
 	while(index->next != NULL) {
 		cost += *(G + (index->city)*n + index->next->city);
 		index=index->next;
 	}
 	return cost;
 }
-/*
+
+
+//returns whether path is feasible. ie: whether went to same city twice (unless is starting city and path is complete),
+//whether path is empty, whether cost of path less than minCost of complete paths (perhaps do this in DFS instead), etc.
 int feasible(struct Path *path) {
+/*
 	int feasible=1;
 
 	int visited[n];
@@ -194,9 +209,11 @@ int feasible(struct Path *path) {
 			index=index->next;
 		}
 	}
-}
 */
-// A structure to represent a stack 
+	return 1;
+}
+
+// A Linked List of paths
 struct Stack 
 { 
 	int top; 
@@ -206,8 +223,7 @@ struct Stack
 	struct Stack *next;
 }; 
 
-// function to create a stack of given capacity. It initializes size of 
-// stack as 0 
+//initializes stack. initial path is -1
 struct Stack* createStack() 
 { 
 	struct Stack* stack = (struct Stack*) malloc(sizeof(struct Stack));
@@ -223,11 +239,11 @@ struct Stack* createStack()
 int isFull(struct Stack* stack) 
 { return stack->top == stack->capacity - 1; } 
 */
-// Stack is empty when top is equal to -1 
+// returns whether stack empty
 int isEmpty(struct Stack* stack) 
 { return stack->array->city == -1; } 
 
-// Function to add an item to stack. It increases top by 1 
+//adds path to stack
 void push(struct Stack* stack, struct Path* path) 
 { 
 	cprintf(FULL, "push", "\n");
@@ -248,9 +264,9 @@ void push(struct Stack* stack, struct Path* path)
 	cnprintf(FULL, "push", "pushed to stack");
 	printPath(FULL, copy);
 	cnprintf(FULL, "push", "end\n");
-} 
+}
 
-// Function to remove an item from stack. It decreases top by 1 
+//removes path that was most recently added to stack. outputs it
 struct Path* pop(struct Stack* stack) 
 { 
 	cprintf(FULL, "pop", "\n");
@@ -274,8 +290,9 @@ struct Path* pop(struct Stack* stack)
 	printPath(FULL, path);
 	cprintf(FULL, "pop", "pop end\n\n");
 	return path;
-} 
+}
 
+//prints all the paths
 void printStack(int verbosity, struct Stack* stack) {
 	cprintf(verbosity, "printstack", "\n");
 	cprintf(verbosity,"printStack", "Printing stack => \n");
@@ -289,7 +306,7 @@ void printStack(int verbosity, struct Stack* stack) {
 	cprintf(verbosity, "printStack", "-----Printing Stack end-----\n\n");
 }
 
-
+//tests whether stack works
 void stackSelfTest() {
 	cnprintf(LOW,"stackSelfTest", "starting");
 	struct Stack* stack = createStack(); 
@@ -324,7 +341,7 @@ void stackSelfTest() {
 	removeLastCity(path);
 }
 
-
+//prints distances between cities
 void printAdjacencyMatrix() {
 	cnprintf(LOW,"printAdjacencyMatrix", "printing Matrix");
 	for (int i = 0; i<n; i++) {
@@ -348,12 +365,13 @@ int visitedCount(int visited[]) {
 	return count;
 }
 
+//main algorithm. prints minCost and the best path
 void DFS(double costTillNow, int firstPoint, int visited[]) {
 	struct Stack* stack = createStack();
 	struct Path* path = createPath();
 	addCity(path, firstPoint);
 	push(stack, path);
-	int minCost=0;
+	double minCost=0;
 	while(!isEmpty(stack)) {
 		printStack(FULL, stack);
 		path = pop(stack);
