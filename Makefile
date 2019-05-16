@@ -1,5 +1,5 @@
 CC=gcc
-OPTS=-g -std=c99 -Werror
+OPTS=-std=c99 -Werror
 
 depthfirst_serial: 
 	$(CC) $(OPTS) -o depthfirst_serial depthfirst_serial.c
