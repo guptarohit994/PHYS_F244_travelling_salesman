@@ -9,7 +9,7 @@
 #define LOW 1
 #define MEDIUM 2
 #define FULL 3
-#define CVERBOSE FULL
+#define CVERBOSE LOW
 #define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? printf("%s: %s\n",caller,str) : 0);
 #define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? printf("%s: %s = %.2lf\n",caller,str,arg) : 0);
 //custom print with one argument (integer)
@@ -214,32 +214,60 @@ double pathCost(struct Path *path) {
 
 //returns whether path is feasible. ie: whether went to same city twice (unless is starting city and path is complete),
 //whether path is empty, whether cost of path less than minCost of complete paths (perhaps do this in DFS instead), etc.
-int feasible(struct Path *path) {
-/*
-	int feasible=1;
+int feasible(struct Path *path, int city, double minCost) {
+	int feasible = TRUE;
 
 	int visited[n];
 	//init
 	for (int i = 0; i<n; i++) {
 		visited[i] = 0;
 	}
-	if(pathEmpty(path))
-		feasible = 0;
-	else if {
+	if(pathEmpty(path)) {
+		fprintf(stderr, "feasible: Empty path should not be passed here.\n");
+		exit(1);
+	} else {
 		struct Path *index = path;
-		while(index != NULL) {
-			if(visited[index->city]==1) {
-				if(index->city==path->city && numCities==n)
-					;
-				else
-					feasible = 0;
+		if (index->next == NULL) {
+
+		}
+		double cost = 0.0;
+		while(index->next != NULL) {
+			visited[index->city] = 1;
+			cost += *(G + (index->city) * n + index->next->city);
+			//this condition seems unreachable. TODO check it
+			if (cost > minCost && minCost != 0.0) {
+				feasible = FALSE;
+				break;
 			}
-			visited[index->city]=1;
 			index=index->next;
+			//when at last node, check for visited and accumulated cost
+			if (index->next == NULL) {
+				visited[index->city] = 1;
+				if (visited[city] == 1) {
+					feasible = FALSE;
+				} else {
+					cost += *(G + (index->city) * n + city);
+					if (cost > minCost && minCost != 0.0) {
+						feasible = FALSE;
+						break;
+					}
+				}
+			}
+		}
+		//check for paths with just a single city
+		if (path->next == NULL) {
+			visited[path->city] = 1;
+			if (visited[city] == 1) {
+					feasible = FALSE;
+			} else {
+				cost += *(G + (index->city) * n + city);
+				if (cost > minCost && minCost != 0.0) {
+					feasible = FALSE;
+				}
+			}
 		}
 	}
-*/
-	return 1;
+	return feasible;
 }
 
 // A Linked List of paths
@@ -420,11 +448,23 @@ int visitedCount(int visited[]) {
 	return count;
 }
 
-int checkBestPath(struct Path *path, struct Path *bestPath) {
-	
+//TODO: complete it
+void freePath(struct Path *path) {
+	struct Path *index = path;
+	while(index->next != NULL) {
+		index = index->next;
+		free(path);
+	}
 }
 
-void DFS(struct PathsLL *pathsLL, struct Path *bestPath) {
+//assumes start point is always zeroth city
+double DFS(int verbosity) {
+	struct PathsLL *pathsLL = createPathsLL();
+	struct PathsLL *completePathsLL = createPathsLL();
+
+	struct Path *bestPath = createPath();
+	double minCost = 0.0;
+
 	//create 1st tour
 	struct Path *path = createPath();
 	addCity(path, 0);
@@ -432,45 +472,39 @@ void DFS(struct PathsLL *pathsLL, struct Path *bestPath) {
 
 	while (!isEmpty(pathsLL)) {
 		struct Path *tempPath = pop(pathsLL);
-		if (numCities(tempPath) == n) {
-			if ()
-		}
-	}
-}
-
-
-/*
-//main algorithm. prints minCost and the best path
-void DFS(double costTillNow, int firstPoint, int visited[]) {
-	struct PathsLL* stack = createPathsLL();
-	struct Path* path = createPath();
-	addCity(path, firstPoint);
-	push(stack, path);
-	double minCost=0;
-	while(!isEmpty(stack)) {
-		printPathsLL(FULL, stack);
-		path = pop(stack);
-		cnprintfa(MEDIUM, "DFS", "\tcostTillNow = ", cost(path));
-		for(int i = 0; i<n; i++) {
-			addCity(path, i);
-			if(feasible(path)) {
-				if(pathFull(path)) {
-					minCost=cost(path);
-					cnprintfa(LOW, "DFS", "Final cost:", minCost);
-					printPathsLL(LOW, stack);
-					cnprintf(LOW, "DFS", "---------------------------------------------------------------");
-
-				}
-				else {
-					push(stack, path);
+		int tempPathCityCount = numCities(tempPath);
+		if ( tempPathCityCount == n) {
+			//add 0th city for RTT time
+			addCity(tempPath, 0);
+			double tempPathCost = pathCost(tempPath);
+			//adding to completePathsLL
+			push(completePathsLL, tempPath);
+			if (minCost == 0) {
+				minCost = tempPathCost;
+				bestPath = tempPath;
+			} else {
+				if (minCost > tempPathCost) {
+					minCost = tempPathCost;
+					bestPath = tempPath;
+				} else {
+					//freePath(tempPath);
 				}
 			}
-			removeLastCity(path);
+			
+		} else {
+			for (int b=n-1; b>=0; b--) {
+				if (feasible(tempPath, b, minCost) == TRUE) {
+					struct Path* newPath = copyPath(tempPath);
+					addCity(newPath, b);
+					push(pathsLL, newPath);
+				}
+			}
 		}
-	}
+		//printPathsLL(verbosity, pathsLL);
+	}//while
+	printPathsLL(verbosity, completePathsLL);
+	return minCost;
 }
-*/
-
 
 //main starts here
 int main(int argc, char *argv[]) { 
@@ -509,17 +543,7 @@ int main(int argc, char *argv[]) {
     double cpu_time_used;
 	
 	G = (double*) malloc(n * n * sizeof(double)); 
-	
-	int visited[n];
 
-	//init
-	struct PathsLL* stack = createPathsLL();
-	for (int i = 0; i<n; i++) {
-		for (int j = 0; j<n; j++) {
-			*(G + (i*n) + j) = 0.0;
-		}
-		visited[i] = 0;
-	}
 
 	// // 4 cities case
 	// // G[0][1] = 20.0;
@@ -585,8 +609,8 @@ int main(int argc, char *argv[]) {
 	
 	startTime = clock();
 	
-	//DFS(start, 0, start, stack, visited);
-	stackSelfTest();
+	minCost = DFS(LOW);
+	//stackSelfTest();
 
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
@@ -594,7 +618,7 @@ int main(int argc, char *argv[]) {
     printf("\n\n\n");
 	printf("=====================================\n");
 	printf("Lowest Cost:%.2f\n", minCost);
-	printf("There were %d possible paths.\n", competingPaths);
+	//printf("There were %d possible paths.\n", competingPaths);
 	printf("\nTook %.10f seconds to execute\n", cpu_time_used);
 
 
