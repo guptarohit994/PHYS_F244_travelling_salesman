@@ -464,6 +464,7 @@ double DFS(int verbosity) {
 
 	struct Path *bestPath = createPath();
 	double minCost = 0.0;
+	double oldMinCost = 0.0;
 
 	//create 1st tour
 	struct Path *path = createPath();
@@ -479,6 +480,8 @@ double DFS(int verbosity) {
 			double tempPathCost = pathCost(tempPath);
 			//adding to completePathsLL
 			push(completePathsLL, tempPath);
+
+			oldMinCost = minCost;
 			if (minCost == 0) {
 				minCost = tempPathCost;
 				bestPath = tempPath;
@@ -501,7 +504,11 @@ double DFS(int verbosity) {
 			}
 		}
 		//printPathsLL(verbosity, pathsLL);
+		//print only when new minCost is achieved
+		if (oldMinCost != minCost)
+			printPath(LOW, bestPath, FALSE);
 	}//while
+	//print all complete paths
 	printPathsLL(verbosity, completePathsLL);
 	return minCost;
 }
