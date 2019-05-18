@@ -451,9 +451,11 @@ int visitedCount(int visited[]) {
 //TODO: complete it
 void freePath(struct Path *path) {
 	struct Path *index = path;
+	struct Path *prevIndex;
 	while(index->next != NULL) {
+		prevIndex = index;
 		index = index->next;
-		free(path);
+		free(prevIndex);
 	}
 }
 
@@ -492,7 +494,7 @@ double DFS(int verbosity) {
 					//print only when new minCost is achieved
 					printPath(LOW, bestPath, FALSE);
 				} else {
-					//freePath(tempPath);
+					freePath(tempPath);
 				}
 			}
 			
