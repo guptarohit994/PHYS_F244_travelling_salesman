@@ -74,6 +74,7 @@ struct Path
 //initializes city to -1. empty path is when city is -1
 struct Path* createPath()
 {
+	cnprintf(FULL, "createPath", "called");
 	struct Path* path = (struct Path*) malloc(sizeof(struct Path));
 	path->city = -1;
 	path->next = NULL;
@@ -137,12 +138,11 @@ int pathFull(struct Path *path) {
 void addCity(struct Path *path, int city)
 {
 	cnprintfai(FULL, "addCity", "adding", city);
-	if(path->city == -1) {
+	if(path->city == -1 && path->next == NULL) {
 		path->city = city;
 		path->costTillNow = 0.0;
 		cnprintfai(FULL, "addCity", "Path", path->city);
-	}
-	else {
+	} else {
 		struct Path *index = path;
 
 		while(index->next != NULL) {
@@ -181,9 +181,12 @@ int removeLastCity(struct Path *path) {
 			index = index->next;
 		}
 		prevIndex->next = NULL;
-		cnprintfai(FULL, "removeLastCity", "city", index->city);
+		int removedCity = index->city;
+		//free memory of last city
+		free(index);
+		cnprintfai(FULL, "removeLastCity", "city", removedCity);
 		cnprintf(FULL, "removeLastCity", "end");
-		return index->city;
+		return removedCity;
 	}
 }
 
@@ -192,10 +195,11 @@ struct Path* copyPath(struct Path *path) {
 	cnprintf(FULL, "copyPath", "start");
 	struct Path *index = path;
 	struct Path *copy = createPath();
-	while(index != NULL) {
+	while(index->next != NULL) {
 		addCity(copy, index->city);
 		index=index->next;
 	}
+	addCity(copy, index->city);
 	cnprintf(FULL, "copyPath", "end");
 	return copy;
 }
@@ -282,6 +286,7 @@ struct PathsLL
 //initializes stack. initial path is -1
 struct PathsLL* createPathsLL() 
 { 
+	cnprintf(FULL, "createPathsLL", "called");
 	struct PathsLL* pathsLL = (struct PathsLL*) malloc(sizeof(struct PathsLL));
 	pathsLL->tour = createPath();
 	pathsLL->next = NULL;
@@ -451,20 +456,20 @@ int visitedCount(int visited[]) {
 //TODO: complete it
 void freePath(struct Path *path) {
 	struct Path *index = path;
-	struct Path *prevIndex;
-	while(index->next != NULL) {
-		prevIndex = index;
-		index = index->next;
-		free(prevIndex);
+	while(path != NULL) {
+		index = path;
+		path = path->next;
+		free(index);
 	}
 }
 
 //assumes start point is always zeroth city
 double DFS(int verbosity) {
 	struct PathsLL *pathsLL = createPathsLL();
-	struct PathsLL *completePathsLL = createPathsLL();
+	//saving memory
+	//struct PathsLL *completePathsLL = createPathsLL();
 
-	struct Path *bestPath = createPath();
+	struct Path *bestPath;
 	double minCost = 0.0;
 
 	//create 1st tour
@@ -479,25 +484,23 @@ double DFS(int verbosity) {
 			//add 0th city for RTT time
 			addCity(tempPath, 0);
 			double tempPathCost = pathCost(tempPath);
-			//adding to completePathsLL
-			push(completePathsLL, tempPath);
+			//saving memory
+			// //adding to completePathsLL
+			// push(completePathsLL, tempPath);
 
 			if (minCost == 0) {
 				minCost = tempPathCost;
-				bestPath = tempPath;
+				//bestPath = tempPath;
 				//print only when new minCost is achieved
-				printPath(LOW, bestPath, FALSE);
+				printPath(LOW, tempPath, FALSE);
 			} else {
 				if (minCost > tempPathCost) {
 					minCost = tempPathCost;
-					bestPath = tempPath;
+
 					//print only when new minCost is achieved
-					printPath(LOW, bestPath, FALSE);
-				} else {
-					freePath(tempPath);
+					printPath(LOW, tempPath, FALSE);
 				}
 			}
-			
 		} else {
 			for (int b=n-1; b>=0; b--) {
 				if (feasible(tempPath, b, minCost) == TRUE) {
@@ -507,10 +510,12 @@ double DFS(int verbosity) {
 				}
 			}
 		}
+		freePath(tempPath);
 		//printPathsLL(verbosity, pathsLL);
 	}//while
-	//print all complete paths
-	printPathsLL(verbosity, completePathsLL);
+	//saving memory
+	// //print all complete paths
+	// printPathsLL(verbosity, completePathsLL);
 	return minCost;
 }
 
@@ -629,6 +634,6 @@ int main(int argc, char *argv[]) {
 	//printf("There were %d possible paths.\n", competingPaths);
 	printf("\nTook %.10f seconds to execute\n", cpu_time_used);
 
-
+	free(G);
 	return 0; 
 } 
