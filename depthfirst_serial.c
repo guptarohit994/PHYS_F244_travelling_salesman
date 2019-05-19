@@ -90,16 +90,14 @@ void printPath(int verbosity, struct Path* path, int silent)
 	}
 	struct Path *index = path;
 
-	while(TRUE) {
+	while(index != NULL) {
 		cprintfaia(verbosity,"printPath", "", index->city, index->costTillNow);
-		if(index->next != NULL) {
+		index=index->next;
+		if (index != NULL) {
 			cprintf(verbosity,"printPath", " ->");	
-			index=index->next;
-		} else {
-			cprintf(verbosity,"printPath", "\n");
-			break;
 		}
 	}
+	cprintf(verbosity,"printPath", "\n");
 	if (silent == FALSE) {
 		cnprintf(verbosity, "printPath", "Done");
 	}
@@ -138,10 +136,10 @@ int pathFull(struct Path *path) {
 void addCity(struct Path *path, int city)
 {
 	cnprintfai(FULL, "addCity", "adding", city);
-	if(path->city == -1 && path->next == NULL) {
+	if(pathEmpty(path)) {
 		path->city = city;
 		path->costTillNow = 0.0;
-		cnprintfai(FULL, "addCity", "Path", path->city);
+		cnprintfai(FULL, "addCity", "Added First City", path->city);
 	} else {
 		struct Path *index = path;
 
@@ -155,7 +153,7 @@ void addCity(struct Path *path, int city)
 		temp->city = city;
 		temp->costTillNow = index->costTillNow + cityToCityCost(index->city, city);
 		index->next = temp;
-		cnprintfai(FULL, "addCity", "New City" ,index->next->city);
+		cnprintfai(FULL, "addCity", "Added New City" ,index->next->city);
 	}
 	cnprintf(FULL, "addCity", "done");
 }
@@ -170,7 +168,7 @@ int removeLastCity(struct Path *path) {
 	} else if (path->next == NULL) {
 		int city = path->city;
 		path->city = -1;
-		cnprintfai(FULL, "removeLastCity", "city", city);
+		cnprintfai(FULL, "removeLastCity", "Removed the only city", city);
 		cnprintf(FULL, "removeLastCity", "end");
 		return city;
 	} else {
@@ -184,7 +182,7 @@ int removeLastCity(struct Path *path) {
 		int removedCity = index->city;
 		//free memory of last city
 		free(index);
-		cnprintfai(FULL, "removeLastCity", "city", removedCity);
+		cnprintfai(FULL, "removeLastCity", "Removed a city", removedCity);
 		cnprintf(FULL, "removeLastCity", "end");
 		return removedCity;
 	}
@@ -195,11 +193,10 @@ struct Path* copyPath(struct Path *path) {
 	cnprintf(FULL, "copyPath", "start");
 	struct Path *index = path;
 	struct Path *copy = createPath();
-	while(index->next != NULL) {
+	while(index != NULL) {
 		addCity(copy, index->city);
 		index=index->next;
 	}
-	addCity(copy, index->city);
 	cnprintf(FULL, "copyPath", "end");
 	return copy;
 }
@@ -295,7 +292,7 @@ struct PathsLL* createPathsLL()
 
 // returns whether pathsLL empty
 int isEmpty(struct PathsLL* pathsLL) 
-{ return (pathsLL->tour->city == -1 && pathsLL->next == NULL); } 
+{ return (pathEmpty(pathsLL->tour) && pathsLL->next == NULL); } 
 
 //adds tour to pathsLL
 void push(struct PathsLL* pathsLL, struct Path* path) 
@@ -305,18 +302,20 @@ void push(struct PathsLL* pathsLL, struct Path* path)
 	if(isEmpty(pathsLL)) {
 		pathsLL->tour = path;
 		//next is null
+		cnprintf(FULL, "push", "added the first tour pathsLL");
 	}
 	else { 
 		struct PathsLL *index = pathsLL;
 		while(index->next != NULL) {
 			index = index->next;
 		}
-		struct PathsLL *temp = createPathsLL();
+		struct PathsLL *temp = (struct PathsLL*) malloc(sizeof(struct PathsLL));// = createPathsLL();
+		temp->next = NULL;
 		temp->tour = path;
 		index->next = temp;
+		cnprintf(FULL, "push", "added a tour to pathsLL");
 	}
-	cnprintf(FULL, "push", "added to pathsLL");
-	//printPath(FULL, path, FALSE);
+	printPath(FULL, path, TRUE);
 	cnprintf(FULL, "push", "end");
 }
 
@@ -326,11 +325,13 @@ struct Path* pop(struct PathsLL* pathsLL)
 	cnprintf(FULL, "pop", "start");
 	struct Path *itemPopped = pathsLL->tour;
 	//if pathsLL is empty
-	if (pathsLL->tour->city == -1 && pathsLL->next == NULL) {
+	if (isEmpty(pathsLL)) {
 		//already empty
+		cnprintf(FULL, "pop", "PathsLL is already empty");
 	} else if(pathsLL->next == NULL) {
 		//itemPopped = pathsLL->tour;
 		pathsLL->tour = createPath();
+		cnprintf(FULL, "pop", "popped the only tour from PathsLL");
 	} else {	 
 		struct PathsLL *index = pathsLL;
 		struct PathsLL *prevIndex;
@@ -340,9 +341,9 @@ struct Path* pop(struct PathsLL* pathsLL)
 		}
 		itemPopped = index->tour;
 		prevIndex->next = NULL;
+		cnprintf(FULL, "pop", "popped a tour PathsLL");
 	}
-	cnprintf(FULL, "pop", "popped from PathsLL");
-	printPath(FULL, itemPopped, FALSE);
+	printPath(FULL, itemPopped, TRUE);
 	cnprintf(FULL, "pop", "end");
 	return itemPopped;
 }
@@ -453,13 +454,21 @@ int visitedCount(int visited[]) {
 	return count;
 }
 
-//TODO: complete it
 void freePath(struct Path *path) {
-	struct Path *index = path;
+	struct Path *index;
 	while(path != NULL) {
 		index = path;
 		path = path->next;
 		free(index);
+	}
+}
+
+void freePathLL(struct PathsLL *pathsLL) {
+	struct PathsLL *index;
+	while(pathsLL != NULL) {
+		index = pathsLL;
+		pathsLL = pathsLL->next;
+		freePath(index->tour);
 	}
 }
 
@@ -516,6 +525,7 @@ double DFS(int verbosity) {
 	//saving memory
 	// //print all complete paths
 	// printPathsLL(verbosity, completePathsLL);
+	freePathLL(pathsLL);
 	return minCost;
 }
 
