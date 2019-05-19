@@ -290,6 +290,35 @@ struct PathsLL* createPathsLL()
 	return pathsLL; 
 }
 
+int visitedCount(int visited[]) {
+	int count = 0;
+	for (int i=0; i<n; i++) {
+		if (visited[i] == 1) {
+			count += 1;
+		}
+	}
+	return count;
+}
+
+void freePath(struct Path *path) {
+	struct Path *index;
+	while(path != NULL) {
+		index = path;
+		path = path->next;
+		free(index);
+	}
+}
+
+void freePathLL(struct PathsLL *pathsLL) {
+	struct PathsLL *index;
+	while(pathsLL != NULL) {
+		index = pathsLL;
+		pathsLL = pathsLL->next;
+		freePath(index->tour);
+		free(index);
+	}
+}
+
 // returns whether pathsLL empty
 int isEmpty(struct PathsLL* pathsLL) 
 { return (pathEmpty(pathsLL->tour) && pathsLL->next == NULL); } 
@@ -300,7 +329,11 @@ void push(struct PathsLL* pathsLL, struct Path* path)
 	cnprintf(FULL, "push", "start");	
 	
 	if(isEmpty(pathsLL)) {
+		//we're replacing path into tour
+		//but free old default tour first
+		freePath(pathsLL->tour);
 		pathsLL->tour = path;
+
 		//next is null
 		cnprintf(FULL, "push", "added the first tour pathsLL");
 	}
@@ -309,6 +342,7 @@ void push(struct PathsLL* pathsLL, struct Path* path)
 		while(index->next != NULL) {
 			index = index->next;
 		}
+		//dont allocate for tour, only for temp
 		struct PathsLL *temp = (struct PathsLL*) malloc(sizeof(struct PathsLL));// = createPathsLL();
 		temp->next = NULL;
 		temp->tour = path;
@@ -341,6 +375,8 @@ struct Path* pop(struct PathsLL* pathsLL)
 		}
 		itemPopped = index->tour;
 		prevIndex->next = NULL;
+		//now free the index
+		free(index);
 		cnprintf(FULL, "pop", "popped a tour PathsLL");
 	}
 	printPath(FULL, itemPopped, TRUE);
@@ -368,68 +404,6 @@ void printPathsLL(int verbosity, struct PathsLL* pathsLL) {
 	cnprintf(verbosity,"printPathsLL", "end");
 }
 
-//tests whether stack works
-void stackSelfTest() {
-	cnprintf(LOW,"stackSelfTest", "starting");
-
-	struct PathsLL* pathsLL = createPathsLL(); 
-	struct Path *path = createPath();
-	struct Path *path2 = createPath();
-	
-	addCity(path, 1);
-	printPath(LOW, path, FALSE);
-	addCity(path, 2);
-	printPath(LOW, path, FALSE);
-
-	push(pathsLL, path);
-	printPathsLL(LOW, pathsLL);
-
-	addCity(path, 3);
-	push(pathsLL, path2);
-	printPathsLL(LOW, pathsLL);
-
-	addCity(path2, 4);
-	removeLastCity(path);
-	printPathsLL(LOW, pathsLL);
-
-	pop(pathsLL);
-	printPathsLL(LOW, pathsLL);
-
-	pop(pathsLL);
-	printPathsLL(LOW, pathsLL);
-
-	pop(pathsLL);
-	printPathsLL(LOW, pathsLL);
-	push(pathsLL, path);
-	
-	// printPathsLL(LOW, pathsLL);
-	// addCity(path, 20);
-	// push(pathsLL, path);
-	// printPathsLL(LOW, pathsLL);
-	// addCity(path, 30);
-	// push(pathsLL, path);
-	// printPathsLL(LOW, pathsLL);
-	// addCity(path, 40);
-	// push(pathsLL, path);
-	// printPathsLL(LOW, pathsLL);
-	// pop(pathsLL);
-	// printPathsLL(LOW, pathsLL);
-	// pop(pathsLL);
-	// printPathsLL(LOW, pathsLL);
-	// pop(pathsLL);
-	// printPathsLL(LOW, pathsLL);
-	// pop(pathsLL);
-	// printPathsLL(LOW, pathsLL);
-	// pop(pathsLL);
-	// printPathsLL(LOW, pathsLL);
-	// printPath(LOW, path, FALSE);
-	// removeLastCity(path);
-	// removeLastCity(path);
-	// removeLastCity(path);
-	// removeLastCity(path);
-	// removeLastCity(path);
-}
-
 //prints distances between cities
 void printAdjacencyMatrix() {
 	cnprintf(LOW,"printAdjacencyMatrix", "printing Matrix");
@@ -444,33 +418,6 @@ void printAdjacencyMatrix() {
 	cprintf(LOW,"printAdjacencyMatrix", "\n");
 }
 
-int visitedCount(int visited[]) {
-	int count = 0;
-	for (int i=0; i<n; i++) {
-		if (visited[i] == 1) {
-			count += 1;
-		}
-	}
-	return count;
-}
-
-void freePath(struct Path *path) {
-	struct Path *index;
-	while(path != NULL) {
-		index = path;
-		path = path->next;
-		free(index);
-	}
-}
-
-void freePathLL(struct PathsLL *pathsLL) {
-	struct PathsLL *index;
-	while(pathsLL != NULL) {
-		index = pathsLL;
-		pathsLL = pathsLL->next;
-		freePath(index->tour);
-	}
-}
 
 //assumes start point is always zeroth city
 double DFS(int verbosity) {
@@ -527,6 +474,78 @@ double DFS(int verbosity) {
 	// printPathsLL(verbosity, completePathsLL);
 	freePathLL(pathsLL);
 	return minCost;
+}
+
+//tests whether stack works
+void stackSelfTest() {
+	cnprintf(LOW,"stackSelfTest", "starting");
+
+	struct PathsLL* pathsLL = createPathsLL(); 
+	struct Path *path = createPath();
+	//struct Path *path2 = createPath();
+	
+	printf("****Adding 1 to path\n");
+	addCity(path, 1);
+	printPath(LOW, path, FALSE);
+	printf("****Adding 2 to path\n");
+	addCity(path, 2);
+	printPath(LOW, path, FALSE);
+
+	push(pathsLL, path);
+	printPathsLL(LOW, pathsLL);
+
+	printf("****Adding 3 to path\n");
+	addCity(path, 3);
+	//push(pathsLL, path2);
+	printPathsLL(LOW, pathsLL);
+
+	// addCity(path2, 4);
+	// removeLastCity(path);
+	// printPathsLL(LOW, pathsLL);
+	printf("****Popping path 1->2->3\n");
+	struct Path *x = pop(pathsLL);
+	printPathsLL(LOW, pathsLL);
+
+	printf("****pushing path 1->2->3\n");
+	push(pathsLL, x);
+	printPathsLL(LOW, pathsLL);
+
+	printf("****Popping path 1->2->3\n");
+	x = pop(pathsLL);
+	printPath(LOW, x, FALSE);
+	printPathsLL(LOW, pathsLL);
+	
+	printf("****pushing path 1->2->3\n");
+	push(pathsLL, x);
+	printPathsLL(LOW, pathsLL);
+	
+	freePathLL(pathsLL);
+	// printPathsLL(LOW, pathsLL);
+	// addCity(path, 20);
+	// push(pathsLL, path);
+	// printPathsLL(LOW, pathsLL);
+	// addCity(path, 30);
+	// push(pathsLL, path);
+	// printPathsLL(LOW, pathsLL);
+	// addCity(path, 40);
+	// push(pathsLL, path);
+	// printPathsLL(LOW, pathsLL);
+	// pop(pathsLL);
+	// printPathsLL(LOW, pathsLL);
+	// pop(pathsLL);
+	// printPathsLL(LOW, pathsLL);
+	// pop(pathsLL);
+	// printPathsLL(LOW, pathsLL);
+	// pop(pathsLL);
+	// printPathsLL(LOW, pathsLL);
+	// pop(pathsLL);
+	// printPathsLL(LOW, pathsLL);
+	// printPath(LOW, path, FALSE);
+	// removeLastCity(path);
+	// removeLastCity(path);
+	// removeLastCity(path);
+	// removeLastCity(path);
+	// removeLastCity(path);
 }
 
 //main starts here
