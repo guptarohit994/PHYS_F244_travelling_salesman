@@ -424,11 +424,11 @@ double DFS(int verbosity) {
 	push(pathsLL, path);
 	#pragma omp parallel shared(pathsLL, minCost, bestPath)
 	{
-	#pragma omp single untied
+	#pragma omp single
 	{
 
 	while (!isEmpty(pathsLL)) {
-		#pragma omp task
+		#pragma omp task untied
 		{
 
 		struct Path *tempPath;
