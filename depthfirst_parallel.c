@@ -4,6 +4,7 @@
 #include <limits.h> 
 #include <time.h>
 #include <string.h>
+#include <omp.h>
 
 //verbosity levels
 #define LOW 1
@@ -51,7 +52,7 @@ int handle_option(char *arg) {
 }
 
 void usage() {
-	fprintf(stderr, "Usage: depthfirst_serial <options>\n");
+	fprintf(stderr, "Usage: depthfirst_parallel <options>\n");
 	fprintf(stderr, "Options:\n");
 	fprintf(stderr, "--help				Print this message\n");
 	fprintf(stderr, "--dataset=<file>	path to the file containing the intercity distance table.\n");
@@ -229,6 +230,7 @@ int feasible(struct Path *path, int city, double minCost) {
 		exit(1);
 	} else {
 		struct Path *index = path;
+//		why is this if statement empty?
 //		if (index->next == NULL) {
 //
 //		}
@@ -239,33 +241,20 @@ int feasible(struct Path *path, int city, double minCost) {
 			//this condition seems unreachable. TODO check it
 			if (cost > minCost && minCost != 0.0) {
 				feasible = FALSE;
-				break;
+				//break;
+				return feasible;
 			}
 			index=index->next;
-			//when at last node, check for visited and accumulated cost
-			if (index->next == NULL) {
-				visited[index->city] = 1;
-				if (visited[city] == 1) {
-					feasible = FALSE;
-				} else {
-					cost += *(G + (index->city) * n + city);
-					if (cost > minCost && minCost != 0.0) {
-						feasible = FALSE;
-						break;
-					}
-				}
-			}
 		}
-		//check for paths with just a single city
-		if (path->next == NULL) {
-			visited[path->city] = 1;
-			if (visited[city] == 1) {
-					feasible = FALSE;
-			} else {
-				cost += *(G + (index->city) * n + city);
-				if (cost > minCost && minCost != 0.0) {
-					feasible = FALSE;
-				}
+			
+		//when at last node/check for paths with just a single city, check for visited and accumulated cost
+		visited[index->city] = 1;
+		if (visited[city] == 1) {
+		feasible = FALSE;
+		} else {
+			cost += *(G + (index->city) * n + city);
+			if (cost > minCost && minCost != 0.0) {
+				feasible = FALSE;
 			}
 		}
 	}
@@ -433,8 +422,20 @@ double DFS(int verbosity) {
 	struct Path *path = createPath();
 	addCity(path, 0);
 	push(pathsLL, path);
+	#pragma omp parallel shared(pathsLL, minCost, bestPath)
+	{
+	#pragma omp single untied
+	{
+
 	while (!isEmpty(pathsLL)) {
-		struct Path *tempPath = pop(pathsLL);
+		#pragma omp task
+		{
+
+		struct Path *tempPath;
+		#pragma omp critical
+		{
+			tempPath = pop(pathsLL);
+		}
 		int tempPathCityCount = numCities(tempPath);
 		if ( tempPathCityCount == n) {
 			//add 0th city for RTT time
@@ -443,36 +444,48 @@ double DFS(int verbosity) {
 			//saving memory
 			// //adding to completePathsLL
 			// push(completePathsLL, tempPath);
+			#pragma omp critical	//perhaps use something besides critical? can push and pull while doing this
+			{
 
-			if (minCost == 0) {
+			if (minCost == 0 || minCost>tempPathCost) {
 				minCost = tempPathCost;
 				//bestPath = tempPath;
 				//print only when new minCost is achieved
 				printPath(LOW, tempPath, FALSE);
-			} else {
-				if (minCost > tempPathCost) {
-					minCost = tempPathCost;
-
-					//print only when new minCost is achieved
-					printPath(LOW, tempPath, FALSE);
-				}
 			}
-		} else {
+
+			}
+		} else if (numCities != 0) {
+			#pragma omp for schedule(dynamic)
+			{
+
 			for (int b=n-1; b>=0; b--) {
 				if (feasible(tempPath, b, minCost) == TRUE) {
 					struct Path* newPath = copyPath(tempPath);
 					addCity(newPath, b);
-					push(pathsLL, newPath);
+					#pragma omp critical
+					{
+						push(pathsLL, newPath);
+					}
 				}
+			}
+			
 			}
 		}
 		freePath(tempPath);
 		//printPathsLL(verbosity, pathsLL);
+		
+		}
+
 	}//while
 	//saving memory
 	// //print all complete paths
 	// printPathsLL(verbosity, completePathsLL);
 	freePathLL(pathsLL);
+
+	}
+
+	}
 	return minCost;
 }
 

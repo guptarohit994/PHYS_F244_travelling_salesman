@@ -7,5 +7,8 @@ depthfirst_serial:
 depthfirst_serial_recursion_dfs:
 	$(CC) $(OPTS) -o depthfirst_serial_recursion_dfs  depthfirst_serial_recursion_dfs.c
 
+depthfirst_parallel: 
+	$(CC) $(OPTS) -o depthfirst_parallel depthfirst_parallel.c
+
 clean: 
-	rm -f depthfirst_serial depthfirst_serial_recursion_dfs;
+	rm -f depthfirst_serial depthfirst_serial_recursion_dfs depthfirst_parallel;
