@@ -35,7 +35,8 @@ int feasible(struct Path *path, int city, double minCost) {
 	}
 	if(pathEmpty(path)) {
 		fprintf(stderr, "feasible: Empty path should not be passed here.\n");
-		exit(1);
+		feasible = FALSE;
+		return feasible;
 	} else {
 		struct Path *index = path;
 
@@ -72,76 +73,103 @@ double DFS(int verbosity) {
 	//struct PathsLL *completePathsLL = createPathsLL();
 
 	struct Path *bestPath;
-	double minCost = 0.0;
+	double minCost = HUGE_VALF;
 
 	//create 1st tour
 	struct Path *path = createPath();
 	addCity(path, 0);
 	push(pathsLL, path);
-	#pragma omp parallel shared(pathsLL, minCost, bestPath)
-	{
-	#pragma omp single
-	{
 
-	while (!isEmpty(pathsLL)) {
-		#pragma omp task untied
-		{
+	//first iteration
+	struct Path *tempPath;
+	tempPath = pop(pathsLL);
+	for (int b=n-1; b>0; b--) {
+		if (feasible(tempPath, b, minCost) == TRUE) {
+			struct Path* newPath = copyPath(tempPath);
+			addCity(newPath, b);
+			push(pathsLL, newPath);
+		}
+	}
+	
+	//max number of threads available
+	int totalNumThreads = omp_get_max_threads();
+	//start parallel region with these # of threads
+	int numStartingThreads = totalNumThreads;
+	//total initial paths for distribution
+	int numInitialPaths = numPaths(pathsLL);
 
-		struct Path *tempPath;
+	if (totalNumThreads > numInitialPaths) {
+		numStartingThreads = numInitialPaths;
+	}
+	int pathsPerThread = (int)(ceil((double)numInitialPaths/numStartingThreads));
+	printf("totalNumThreads:%d, numStartingThreads:%d, numInitialPaths:%d, pathsPerThread:%d\n", \
+				totalNumThreads, numStartingThreads, numInitialPaths, pathsPerThread);
+
+	#pragma omp parallel shared(pathsLL, bestPath, pathsPerThread) \
+						 reduction(min:minCost) \
+						 private(tempPath) \
+						 num_threads(numStartingThreads)
+	{
+		int threadID = omp_get_thread_num();
+		struct PathsLL* pvtPathsLL;
 		#pragma omp critical
 		{
-			tempPath = pop(pathsLL);
+			pvtPathsLL = get_my_share(pathsLL, threadID, pathsPerThread);
 		}
-		int tempPathCityCount = numCities(tempPath);
-		if ( tempPathCityCount == n) {
-			//add 0th city for RTT time
-			addCity(tempPath, 0);
-			double tempPathCost = pathCost(tempPath);
-			//saving memory
-			// //adding to completePathsLL
-			// push(completePathsLL, tempPath);
-			#pragma omp critical	//perhaps use something besides critical? can push and pull while doing this
-			{
 
-			if (minCost == 0 || minCost>tempPathCost) {
-				minCost = tempPathCost;
-				//bestPath = tempPath;
-				//print only when new minCost is achieved
-				printPath(LOW, tempPath, FALSE);
+		
+		while (!isEmpty(pvtPathsLL)) {
+			//printf("Thread:%d is running this task\n", omp_get_thread_num());
+			//struct Path *tempPath;
+			#pragma omp critical 
+			{
+				//printf("Thread:%d is running this task\n", omp_get_thread_num());
+				tempPath = pop(pvtPathsLL);
+				//printPath(LOW, tempPath, FALSE);
 			}
 
-			}
-		} else if (numCities != 0) {
-			#pragma omp for schedule(dynamic)
-			{
-
-			for (int b=n-1; b>=0; b--) {
-				if (feasible(tempPath, b, minCost) == TRUE) {
-					struct Path* newPath = copyPath(tempPath);
-					addCity(newPath, b);
-					#pragma omp critical
-					{
-						push(pathsLL, newPath);
+			int tempPathCityCount = numCities(tempPath);
+			if ( tempPathCityCount == n) {
+				//add 0th city for RTT time
+				addCity(tempPath, 0);
+				double tempPathCost = pathCost(tempPath);
+				//saving memory
+				// //adding to completePathsLL
+				// push(completePathsLL, tempPath);
+				if (minCost>tempPathCost) {
+					minCost = tempPathCost;
+					//bestPath = tempPath;
+					//print only when new minCost is achieved
+					printPath(LOW, tempPath, FALSE);
+				}
+			} else {
+				//#pragma omp parallel for schedule(dynamic) shared(minCost, tempPath, pathsLL)
+				for (int b=n-1; b>0; b--) {
+					//printf("Thread:%d starting on b:%d\n", omp_get_thread_num(), b);
+					if (feasible(tempPath, b, minCost) == TRUE) {
+						struct Path* newPath = copyPath(tempPath);
+						addCity(newPath, b);
+						push(pvtPathsLL, newPath);
 					}
 				}
-			}
 			
-			}
-		}
-		freePath(tempPath);
-		//printPathsLL(verbosity, pathsLL);
+			}	
+			//printf("********************************\n");
+			freePath(tempPath);
+			//printPathsLL(verbosity, pathsLL);
+		}//while
 		
-		}
+		freePathLL(pvtPathsLL);
 
-	}//while
+	}
 	//saving memory
 	// //print all complete paths
 	// printPathsLL(verbosity, completePathsLL);
 	freePathLL(pathsLL);
 
-	}
+	//}
 
-	}
+	//}
 	return minCost;
 }
 
@@ -216,15 +244,19 @@ int main(int argc, char *argv[]) {
         // printf("Number:%lf\n", numberArray[i]);
     }
 	
+    printf ( "Number of processors available = %d\n", omp_get_num_procs ( ) );
+  	printf ( "Number of threads =              %d\n", omp_get_max_threads ( ) );
+
 	printAdjacencyMatrix();
 
 	int start = 0;
 	
 	startTime = clock();
+	double wtime = omp_get_wtime ();
 	
 	minCost = DFS(LOW);
 	//stackSelfTest();
-
+	wtime = omp_get_wtime () - wtime;
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
@@ -234,6 +266,7 @@ int main(int argc, char *argv[]) {
 	printf("Lowest Cost:%.2f\n", minCost);
 	fprintf(outfile_fp, "Lowest Cost:%.2f\n", minCost);
 	//printf("There were %d possible paths.\n", competingPaths);
+	printf ( "Wallclock time = %f\n", wtime );
 	printf("\nTook %.10f seconds to execute\n", cpu_time_used);
 	fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
 
