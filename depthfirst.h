@@ -13,24 +13,24 @@
 #define MEDIUM 2
 #define FULL 3
 #define CVERBOSE LOW
-#define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s: %s\n",caller,str) : 0);
-#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s: %s = %.2lf\n",caller,str,arg) : 0);
+#define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s\n",caller,str) : 0);
+#define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s = %.2lf\n",caller,str,arg) : 0);
 //custom print with one argument (integer)
-#define cnprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s: %s = %d\n",caller,str,arg) : 0);
+#define cnprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s = %d\n",caller,str,arg) : 0);
 //custom print with two arguments (double)
-#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s: %s = %.2lf:%.2lf\n",caller,str,arg1,arg2) : 0);
+#define cnprintfaa(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s = %.2lf:%.2lf\n",caller,str,arg1,arg2) : 0);
 //custom print with first argument (integer) and second argument double
-#define cnprintfaia(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s: %s = %d:%.2lf\n",caller,str,arg1,arg2) : 0);
+#define cnprintfaia(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s = %d:%.2lf\n",caller,str,arg1,arg2) : 0);
 
-#define cprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s",str) : 0);
+#define cprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s",str) : 0);
 
-#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s %.2lf",str,arg) : 0);
+#define cprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s %.2lf",str,arg) : 0);
 
-#define cprintfaia(lvl,caller,str,arg1, arg2) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s %d(%.2lf)",str,arg1, arg2) : 0);
+#define cprintfaia(lvl,caller,str,arg1, arg2) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s %d(%.2lf)",str,arg1, arg2) : 0);
 //custom print with an argument (integer)
-#define cprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s %d",str,arg) : 0);
+#define cprintfai(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s %d",str,arg) : 0);
 //custom print with two arguments (integer)
-#define cnprintfaai(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? fprintf(stdout, "%s: %s = %d:%d\n",caller,str,arg1,arg2) : 0);
+#define cnprintfaai(lvl,caller,str,arg1,arg2) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s = %d:%d\n",caller,str,arg1,arg2) : 0);
 
 #define TRUE 1
 #define FALSE 0
