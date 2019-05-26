@@ -90,6 +90,7 @@ double DFS(int verbosity) {
 			push(pathsLL, newPath);
 		}
 	}
+	freePath(tempPath);
 	
 	//max number of threads available
 	int totalNumThreads = omp_get_max_threads();
