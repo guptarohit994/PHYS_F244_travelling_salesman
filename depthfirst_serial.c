@@ -167,10 +167,11 @@ int main(int argc, char *argv[]) {
 	if (!strcmp(outfile_name,"")) {
 		char default_outfile_name[100] = "./depthfirst_serial_out.txt";
 		strncpy(outfile_name, default_outfile_name, 100);
-		printf("Using default outfile_name:\"%s\"\n",outfile_name);
 	}
 	
 	outfile_fp = fopen(outfile_name, "w+");
+	printf("Writing the output to log file:\t%s\n",outfile_name);
+
 	fprintf(outfile_fp, "Dataset file_name: %s\n", file_name);
 	fprintf(outfile_fp, "numCities: %d\n", n);
 
@@ -223,7 +224,7 @@ int main(int argc, char *argv[]) {
 	printf("Lowest Cost:%.2f\n", minCost);
 	fprintf(outfile_fp, "Lowest Cost:%.2f\n", minCost);
 	//printf("There were %d possible paths.\n", competingPaths);
-	printf("\nTook %.10f seconds to execute\n", cpu_time_used);
+	printf("Wallclock time = %f\n", cpu_time_used);
 	fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
 
 	free(G);

@@ -4,6 +4,10 @@ SUM=0
 EXECUTABLE=$1
 CITIES=$2
 
+PWD=`pwd`
+echo "Currently in $PWD"
+echo -e "Using slurm job id ${SLURM_JOB_ID}\n"
+
 if [ -z "$EXECUTABLE" ]
 then
     echo "Error! Need an EXECUTABLE: depthfirst_parallel | depthfirst_serial"
@@ -35,6 +39,7 @@ then
     DATASET_PATH="./datasets/lau15_dist_15c_d.txt"
 fi
 
+OUTFILE_PATH="${EXECUTABLE}_${SLURM_JOB_ID}.txt"
 
 echo "Running dataset with ${CITIES} cities and dataset is at ${DATASET_PATH}"
 
@@ -47,7 +52,7 @@ do
     do
         #TEMP=`./heated_plate_openmp`
         #echo $TEMP
-        TIME_TAKEN=`export OMP_NUM_THREADS=$threads; ./$EXECUTABLE --dataset="$DATASET_PATH" --cities="$CITIES" | grep -i wallclock | cut -d = -f2 | cut -d ' ' -f2`
+        TIME_TAKEN=`export OMP_NUM_THREADS=$threads; ./$EXECUTABLE --dataset="$DATASET_PATH" --cities="$CITIES" --outfile="$OUTFILE_PATH" | grep -i wallclock | cut -d = -f2 | cut -d ' ' -f2`
         #echo "TIME_TAKEN=$TIME_TAKEN"
         SUM=$(echo "$TIME_TAKEN + $SUM" | bc)
     done
