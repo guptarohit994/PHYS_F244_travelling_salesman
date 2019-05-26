@@ -15,7 +15,7 @@
 #define LOW 1
 #define MEDIUM 2
 #define FULL 3
-#define CVERBOSE FULL
+#define CVERBOSE LOW
 #define cnprintf(lvl,caller,str) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s\n",caller,str) : 0);
 #define cnprintfa(lvl,caller,str,arg) ((CVERBOSE>=lvl) ? fprintf(outfile_fp, "%s: %s = %.2lf\n",caller,str,arg) : 0);
 //custom print with one argument (integer)

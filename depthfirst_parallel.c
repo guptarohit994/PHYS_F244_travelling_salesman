@@ -111,22 +111,17 @@ double DFS(int verbosity) {
 
   struct PathsLL* pvtPathsLL=pathsLL;
   int counter=0;
-	#pragma omp parallel shared(minCost, counter, pvtPathsLL, pathsLL, bestPath, pathsPerThread, minCost_shared) \
+	#pragma omp parallel shared(minCost, counter, pvtPathsLL, bestPath, pathsPerThread) \
 						 private(tempPath) \
 						 num_threads(numStartingThreads)
 	{
-    int threadID = omp_get_thread_num();
     #pragma omp single
     {
-            /*#pragma omp critical
-      {
-        pvtPathsLL = get_my_share(pathsLL, threadID, pathsPerThread);
-      }*/
 
    //   while(!isEmpty(pvtPathsLL) && counter<totalNumThreads+20) {
       while(!isEmpty(pvtPathsLL)) {
        // if(counter<totalNumThreads+200) {
-        #pragma omp task shared(minCost, counter, pvtPathsLL, pathsLL, bestPath, pathsPerThread, minCost_shared) private(tempPath)
+        #pragma omp task shared(minCost, counter, pvtPathsLL, bestPath, pathsPerThread) private(tempPath)
         {
           //printf("Thread:%d is running this task\n", omp_get_thread_num());
           #pragma omp critical 
@@ -149,19 +144,14 @@ double DFS(int verbosity) {
             if (minCost>tempPathCost) {
               minCost = tempPathCost;
               //update minCost if it is less than the current known value
-              if (minCost < minCost_shared) {
-                minCost_shared = minCost;
-   //             #pragma omp flush(minCost_shared)
-              }
-              //bestPath = tempPath;
-              //print only when new minCost is achieved
+   //             #pragma omp flush(minCost_shared)	//flush vs critical?
               printPath(LOW, tempPath, FALSE);
             }
             }//critical
           } else if (!pathEmpty(tempPath)) {
             //#pragma omp parallel for schedule(dynamic) shared(minCost, tempPath, pathsLL)
             for (int b=n-1; b>0; b--) {
-              if (feasible(tempPath, b, minCost_shared) == TRUE) {
+              if (feasible(tempPath, b, minCost) == TRUE) {
                 struct Path* newPath = copyPath(tempPath);
                 addCity(newPath, b);
                 #pragma omp critical
