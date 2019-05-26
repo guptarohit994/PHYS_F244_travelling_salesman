@@ -1,0 +1,20 @@
+https://people.sc.fsu.edu/~jburkardt/datasets/tsp/tsp.html
+GR17 is a set of 17 cities, from TSPLIB. The minimal tour has length 2085.
+1
+4
+13
+7
+8
+6
+17
+14
+15
+3
+11
+10
+2
+5
+9
+12
+16
+
