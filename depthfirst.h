@@ -1,12 +1,15 @@
 #ifndef DEPTHFIRST_H
 #define DEPTHFIRST_H
 
+#define _POSIX_SOURCE 1
+#define _BSD_SOURCE
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <limits.h> 
 #include <time.h>
 #include <string.h>
 #include <math.h>
+#include <sys/stat.h>
 
 //verbosity levels
 #define LOW 1
@@ -47,6 +50,19 @@ int handle_option(char *arg);
 
 void usage();
 
+//update the size of FILE IO buffers
+void setBufSize(int numCities) {
+	setlinebuf(outfile_fp);
+	// struct stat stats;
+ //    if(fstat(fileno(outfile_fp), &stats) == -1) { // POSIX only
+ //        perror("fstat");
+ //    }
+ 
+ //    printf("BUFSIZ is %d, but optimal block size is %ld\n", BUFSIZ, stats.st_blksize);
+ //    if(setvbuf(outfile_fp, NULL, _IOLBF, stats.st_blksize) != 0) {
+ //       perror("setvbuf failed"); // POSIX version sets errno
+ //    }
+}
 
 double cityToCityCost(int fromCity, int toCity) {
 	return *(G + (fromCity) * n + toCity);

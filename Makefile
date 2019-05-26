@@ -1,5 +1,5 @@
 CC=gcc
-OPTS=-std=c99 -Werror
+OPTS=-std=c99 -Werror -D_POSIX_SOURCE
 
 all: depthfirst_serial depthfirst_parallel depthfirst_serial_recursion_dfs
 

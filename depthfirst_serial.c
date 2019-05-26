@@ -172,6 +172,11 @@ int main(int argc, char *argv[]) {
 	outfile_fp = fopen(outfile_name, "w+");
 	printf("Writing the output to log file:\t%s\n",outfile_name);
 
+	//only change the size of buffer when debugging
+	#if CVERBOSE > 1
+	setBufSize(n);
+	#endif
+
 	fprintf(outfile_fp, "Dataset file_name: %s\n", file_name);
 	fprintf(outfile_fp, "numCities: %d\n", n);
 
