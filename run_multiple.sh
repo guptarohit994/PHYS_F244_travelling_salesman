@@ -40,12 +40,13 @@ then
 fi
 
 OUTFILE_PATH="${EXECUTABLE}_${SLURM_JOB_ID}.txt"
+declare -a AVERAGE
 
 echo "Running dataset with ${CITIES} cities and dataset is at ${DATASET_PATH}"
 
-echo -e "\nthreads\t       \tAverage time (in seconds)"
-echo "========================================="
-for threads in 1 2 3 4 5 6 7 8 9 10 11 12 13
+echo -e "\nthreads\t       \tAv time (in seconds)    Speedup over serial (times)"
+echo "==================================================================="
+for threads in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 do
     SUM=0
     for i in {1..10}
@@ -58,7 +59,10 @@ do
     done
 
     #echo "sum=$SUM"
-    AVERAGE=$(echo "scale = 6; $SUM / 10" | bc)
-    echo -e "$threads\t       \t$AVERAGE"
-    echo "========================================="
+    AVERAGE[$threads]=$(echo "scale = 6; $SUM / 10" | bc)
+    SPEEDUP=$(echo "scale = 2; ${AVERAGE[1]} / ${AVERAGE[$threads]}" | bc)
+    printf "%d\t    \t%.6f\t  \t%.2f\n" "$threads" "${AVERAGE[$threads]}" "$SPEEDUP"
+    #echo -e "$threads\t       \t{$AVERAGE[$threads]}\t      \t$SPEEDUP"
+    echo "==================================================================="
 done
+
