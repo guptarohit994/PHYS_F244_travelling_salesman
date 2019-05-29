@@ -124,12 +124,10 @@ double DFS(int verbosity) {
 		
 		while (!isEmpty(pvtPathsLL)) {
 			//printf("Thread:%d is running this task\n", omp_get_thread_num());
-			#pragma omp critical 
-			{
-				//printf("Thread:%d is running this task\n", omp_get_thread_num());
-				tempPath = pop(pvtPathsLL);
-				//printPath(LOW, tempPath, FALSE);
-			}
+		
+			//printf("Thread:%d is running this task\n", omp_get_thread_num());
+			tempPath = pop(pvtPathsLL);
+			//printPath(LOW, tempPath, FALSE);
 
 			int tempPathCityCount = numCities(tempPath);
 			if ( tempPathCityCount == n) {
