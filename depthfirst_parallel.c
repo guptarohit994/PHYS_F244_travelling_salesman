@@ -74,6 +74,7 @@ double DFS(int verbosity) {
 
 	struct Path *bestPath;
 	double minCost = HUGE_VALF;
+	long numCompletePaths = 0;
 
 	//create 1st tour
 	struct Path *path = createPath();
@@ -110,7 +111,7 @@ double DFS(int verbosity) {
 	double minCost_shared = minCost;
 
 	#pragma omp parallel shared(pathsLL, bestPath, pathsPerThread, minCost_shared) \
-						 reduction(min:minCost) \
+						 reduction(min:minCost) reduction(+:numCompletePaths)\
 						 private(tempPath) \
 						 num_threads(numStartingThreads)
 	{
@@ -132,6 +133,7 @@ double DFS(int verbosity) {
 			int tempPathCityCount = numCities(tempPath);
 			if ( tempPathCityCount == n) {
 				//add 0th city for RTT time
+				numCompletePaths += 1;
 				addCity(tempPath, 0);
 				double tempPathCost = pathCost(tempPath);
 				//saving memory
@@ -139,10 +141,13 @@ double DFS(int verbosity) {
 				// push(completePathsLL, tempPath);
 				if (minCost>tempPathCost) {
 					minCost = tempPathCost;
-					//update minCost if it is less than the current known value
-					if (minCost < minCost_shared) {
-						minCost_shared = minCost;
-						#pragma omp flush(minCost_shared)
+					#pragma omp critical
+					{
+						//update minCost if it is less than the current known value
+						if (minCost < minCost_shared) {
+							minCost_shared = minCost;
+							#pragma omp flush(minCost_shared)
+						}
 					}
 					//bestPath = tempPath;
 					//print only when new minCost is achieved
@@ -164,8 +169,9 @@ double DFS(int verbosity) {
 		}//while
 		
 		freePathLL(pvtPathsLL);
-
 	}
+	printf("Evaluated a total of %ld feasible complete paths.\n", numCompletePaths);
+	fprintf(outfile_fp, "Evaluated a total of %ld feasible complete paths.\n", numCompletePaths);
 	//saving memory
 	// //print all complete paths
 	// printPathsLL(verbosity, completePathsLL);

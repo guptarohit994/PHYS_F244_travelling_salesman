@@ -129,8 +129,8 @@ double DFS(int verbosity) {
 	// //print all complete paths
 	// printPathsLL(verbosity, completePathsLL);
 	freePathLL(pathsLL);
-	printf("Evaluated a total of %ld paths.\n", numCompletePaths);
-	fprintf(outfile_fp, "Evaluated a total of %ld paths.\n", numCompletePaths);
+	printf("Evaluated a total of %ld feasible complete paths.\n", numCompletePaths);
+	fprintf(outfile_fp, "Evaluated a total of %ld feasible complete paths.\n", numCompletePaths);
 	return minCost;
 }
 
