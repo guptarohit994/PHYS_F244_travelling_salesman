@@ -74,6 +74,8 @@ int feasible(struct Path *path, int city, double minCost) {
 	return feasible;
 }
 
+
+
 //assumes start point is always zeroth city
 double DFS(int verbosity) {
 	struct PathsLL *pathsLL = createPathsLL();
@@ -325,11 +327,15 @@ int main(int argc, char *argv[]) {
 	MPI_Get_processor_name(hostname, &len);
 	printf ("MPI task %d has started on %s...\n", taskID, hostname);
 
-	char default_outfile_name[100] = "./depthfirst_parallel_out";
 	char buf[15];
 	snprintf(buf, 15, "_%d.txt", taskID);
-	strcat(default_outfile_name, buf);
-	strncpy(outfile_name, default_outfile_name, 100);
+	if (!strcmp(outfile_name,"")) {
+		char default_outfile_name[100] = "./depthfirst_parallel_hybrid";
+		strcat(default_outfile_name, buf);
+		strncpy(outfile_name, default_outfile_name, 100);
+	} else {
+		strcat(outfile_name, buf);
+	}
 	
 	outfile_fp = fopen(outfile_name, "w+");
 	printf("taskID:%d, Writing the output to log file:\t%s\n",taskID, outfile_name);
@@ -385,6 +391,7 @@ int main(int argc, char *argv[]) {
 	startTime = clock();
 	MPI_Barrier(MPI_COMM_WORLD); /* IMPORTANT */
 	double wtime = MPI_Wtime();
+	//printf("start time:%f\n", wtime);
 	
 	double minCostLocal = DFS(LOW);
 	
@@ -393,6 +400,7 @@ int main(int argc, char *argv[]) {
 
 	MPI_Barrier(MPI_COMM_WORLD); /* IMPORTANT */
 	wtime = MPI_Wtime () - wtime;
+	//printf("total time:%f\n", wtime);
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
