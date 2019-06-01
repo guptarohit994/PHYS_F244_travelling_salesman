@@ -275,60 +275,38 @@ int isEmpty(struct PathsLL* pathsLL)
 //adds tour to pathsLL
 void push(struct PathsLL* pathsLL, struct Path* path) 
 { 
-	cnprintf(FULL, "push", "start");
-  int scenario=-1;
-	struct PathsLL *temp = (struct PathsLL*) malloc(sizeof(struct PathsLL));// = createPathsLL();
-  temp->next = NULL;
-	temp->tour = path;
-	struct PathsLL *index = pathsLL;
-  #pragma omp critical(updateStack)
-  {
+	cnprintf(FULL, "push", "start");	
 	
 	if(isEmpty(pathsLL)) {
 		//we're replacing path into tour
 		//but free old default tour first
 		freePath(pathsLL->tour);
 		pathsLL->tour = path;
-    scenario=0;
+
+		//next is null
+		cnprintf(FULL, "push", "added the first tour pathsLL");
 	}
 	else { 
+		struct PathsLL *index = pathsLL;
 		while(index->next != NULL) {
 			index = index->next;
 		}
 		//dont allocate for tour, only for temp
-		//struct PathsLL *temp = (struct PathsLL*) malloc(sizeof(struct PathsLL));// = createPathsLL();
+		struct PathsLL *temp = (struct PathsLL*) malloc(sizeof(struct PathsLL));// = createPathsLL();
+		temp->next = NULL;
+		temp->tour = path;
 		index->next = temp;
-    scenario=1;
+		cnprintf(FULL, "push", "added a tour to pathsLL");
 	}
-	
-  }//critical
-  if(scenario==0) {
-		//next is null
-		cnprintf(FULL, "push", "added the first tour pathsLL");
-    free(temp);//use free not freePathLL to keep path
-  } else if(scenario==1) {
-    cnprintf(FULL, "push", "added a tour to pathsLL");
-  } else {
-    cnprintf(FULL, "push", "error");
-  }
-  printPath(FULL, path, TRUE);
+	printPath(FULL, path, TRUE);
 	cnprintf(FULL, "push", "end");
 }
 
 //removes path that was most recently added to PathsLL. outputs it
 struct Path* pop(struct PathsLL* pathsLL) 
-{
-
+{ 
 	cnprintf(FULL, "pop", "start");
-  struct Path *itemPopped;
-  int scenario=-1;
-	struct PathsLL *index = pathsLL;
-  struct Path *emptyPathCopy=createPath();
-  #pragma omp critical(updateStack)
-  {
-
-	itemPopped = pathsLL->tour;
-  /*
+	struct Path *itemPopped = pathsLL->tour;
 	//if pathsLL is empty
 	if (isEmpty(pathsLL)) {
 		//already empty
@@ -338,34 +316,20 @@ struct Path* pop(struct PathsLL* pathsLL)
 		//itemPopped = pathsLL->tour;
 		pathsLL->tour = createPath();
 		cnprintf(FULL, "pop", "popped the only tour from PathsLL");
-	}
- */
- if(pathsLL->next==NULL) {
-   pathsLL->tour = emptyPathCopy;
-   scenario=0;
- } else {	 
+	} else {	 
+		struct PathsLL *index = pathsLL;
 		struct PathsLL *prevIndex;
 		while(index->next != NULL) {
-      if(index->next->next==NULL)
-  			prevIndex = index;
+			prevIndex = index;
 			index = index->next;
 		}
-		prevIndex->next = NULL;	
-    scenario=1;
-	}
-
-  }//critical
-  if(scenario==0) {
-    cnprintf(FULL, "pop", "popped the only tour from PathsLL");
-  } else if(scenario==1) {
-		cnprintf(FULL, "pop", "popped a tour PathsLL");
-    free(emptyPathCopy);//use free instead of freePath since next is NULL
 		itemPopped = index->tour;
+		prevIndex->next = NULL;
+		//now free the index
 		free(index);
-  } else {
-    cnprintf(FULL, "pop", "error");
-  }
-  printPath(FULL, itemPopped, TRUE);
+		cnprintf(FULL, "pop", "popped a tour PathsLL");
+	}
+	printPath(FULL, itemPopped, TRUE);
 	cnprintf(FULL, "pop", "end");
 	return itemPopped;
 }

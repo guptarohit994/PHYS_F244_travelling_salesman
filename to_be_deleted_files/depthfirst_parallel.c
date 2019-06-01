@@ -98,11 +98,10 @@ double DFS(int verbosity) {
 	int numStartingThreads = totalNumThreads;
 	//total initial paths for distribution
 	int numInitialPaths = numPaths(pathsLL);
-/*
+
 	if (totalNumThreads > numInitialPaths) {
 		numStartingThreads = numInitialPaths;
 	}
-  */
 	int pathsPerThread = (int)(ceil((double)numInitialPaths/numStartingThreads));
 	printf("totalNumThreads:%d, numStartingThreads:%d, numInitialPaths:%d, pathsPerThread:%d\n", \
 				totalNumThreads, numStartingThreads, numInitialPaths, pathsPerThread);
@@ -112,7 +111,7 @@ double DFS(int verbosity) {
 
   struct PathsLL* pvtPathsLL=pathsLL;
   int counter=0;
-	#pragma omp parallel shared(minCost, pvtPathsLL) \
+	#pragma omp parallel shared(minCost, counter, pvtPathsLL, bestPath, pathsPerThread) \
 						 private(tempPath) \
 						 num_threads(numStartingThreads)
 	{
@@ -122,15 +121,15 @@ double DFS(int verbosity) {
    //   while(!isEmpty(pvtPathsLL) && counter<totalNumThreads+20) {
       while(!isEmpty(pvtPathsLL)) {
        // if(counter<totalNumThreads+200) {
-        #pragma omp task shared(minCost, pvtPathsLL) private(tempPath)
+        #pragma omp task shared(minCost, counter, pvtPathsLL, bestPath, pathsPerThread) private(tempPath)
         {
           //printf("Thread:%d is running this task\n", omp_get_thread_num());
-    //      #pragma omp critical(updateStack) 
-      //    {
+          #pragma omp critical 
+          {
             //printf("Thread:%d is running this task\n", omp_get_thread_num());
             tempPath = pop(pvtPathsLL);
             //printPath(LOW, tempPath, FALSE);
-       //   }
+          }
 
           int tempPathCityCount = numCities(tempPath);
           if ( tempPathCityCount == n) {
@@ -140,7 +139,7 @@ double DFS(int verbosity) {
             //saving memory
             // //adding to completePathsLL
             // push(completePathsLL, tempPath);
-            #pragma omp critical(updateMin)
+            #pragma omp critical
             {
             if (minCost>tempPathCost) {
               minCost = tempPathCost;
@@ -150,15 +149,15 @@ double DFS(int verbosity) {
             }
             }//critical
           } else if (!pathEmpty(tempPath)) {
-            //#pragma omp parallel for schedule(dynamic) shared(minCost, tempPath, pvtPathsLL)
+            //#pragma omp parallel for schedule(dynamic) shared(minCost, tempPath, pathsLL)
             for (int b=n-1; b>0; b--) {
               if (feasible(tempPath, b, minCost) == TRUE) {
                 struct Path* newPath = copyPath(tempPath);
                 addCity(newPath, b);
-      //          #pragma omp critical(updateStack)
-        //        {
+                #pragma omp critical
+                {
                 push(pvtPathsLL, newPath);
-          //      }
+                }
               }
             }
           
@@ -235,9 +234,9 @@ int main(int argc, char *argv[]) {
 	printf("Writing the output to log file:\t%s\n",outfile_name);
 	
 	//only change the size of buffer when debugging
-//	#if CVERBOSE > 1
+	#if CVERBOSE > 1
 	setBufSize(n);
-//	#endif
+	#endif
 
 	fprintf(outfile_fp, "Dataset file_name: %s\n", file_name);
 	fprintf(outfile_fp, "numCities: %d\n", n);

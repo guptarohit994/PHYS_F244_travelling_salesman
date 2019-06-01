@@ -1,6 +1,6 @@
 #include "depthfirst.h"
 #include <omp.h>
-#include <unistd.h>
+
 int handle_option(char *arg) {
 	if (!strncmp(arg,"--dataset=",10)) {
 		sscanf(arg+10,"%s", file_name); 
@@ -34,7 +34,7 @@ int feasible(struct Path *path, int city, double minCost) {
 		visited[i] = 0;
 	}
 	if(pathEmpty(path)) {
-		//fprintf(stderr, "feasible: Empty path should not be passed here.\n");
+		fprintf(stderr, "feasible: Empty path should not be passed here.\n");
 		feasible = FALSE;
 		return feasible;
 	} else {
@@ -98,11 +98,10 @@ double DFS(int verbosity) {
 	int numStartingThreads = totalNumThreads;
 	//total initial paths for distribution
 	int numInitialPaths = numPaths(pathsLL);
-/*
+
 	if (totalNumThreads > numInitialPaths) {
 		numStartingThreads = numInitialPaths;
 	}
-  */
 	int pathsPerThread = (int)(ceil((double)numInitialPaths/numStartingThreads));
 	printf("totalNumThreads:%d, numStartingThreads:%d, numInitialPaths:%d, pathsPerThread:%d\n", \
 				totalNumThreads, numStartingThreads, numInitialPaths, pathsPerThread);
@@ -110,85 +109,69 @@ double DFS(int verbosity) {
 							totalNumThreads, numStartingThreads, numInitialPaths, pathsPerThread);
 	double minCost_shared = minCost;
 
-  struct PathsLL* pvtPathsLL=pathsLL;
-  int counter=0;
-	#pragma omp parallel shared(minCost, pvtPathsLL) \
+	#pragma omp parallel shared(pathsLL, bestPath, pathsPerThread, minCost_shared) \
+						 reduction(min:minCost) \
 						 private(tempPath) \
 						 num_threads(numStartingThreads)
 	{
-    #pragma omp single
-    {
+		int threadID = omp_get_thread_num();
+		struct PathsLL* pvtPathsLL;
+		#pragma omp critical
+		{
+			pvtPathsLL = get_my_share(pathsLL, threadID, pathsPerThread);
+		}
 
-   //   while(!isEmpty(pvtPathsLL) && counter<totalNumThreads+20) {
-      while(!isEmpty(pvtPathsLL)) {
-       // if(counter<totalNumThreads+200) {
-        #pragma omp task shared(minCost, pvtPathsLL) private(tempPath)
-        {
-          //printf("Thread:%d is running this task\n", omp_get_thread_num());
-    //      #pragma omp critical(updateStack) 
-      //    {
-            //printf("Thread:%d is running this task\n", omp_get_thread_num());
-            tempPath = pop(pvtPathsLL);
-            //printPath(LOW, tempPath, FALSE);
-       //   }
+		
+		while (!isEmpty(pvtPathsLL)) {
+			//printf("Thread:%d is running this task\n", omp_get_thread_num());
+			#pragma omp critical 
+			{
+				//printf("Thread:%d is running this task\n", omp_get_thread_num());
+				tempPath = pop(pvtPathsLL);
+				//printPath(LOW, tempPath, FALSE);
+			}
 
-          int tempPathCityCount = numCities(tempPath);
-          if ( tempPathCityCount == n) {
-            //add 0th city for RTT time
-            addCity(tempPath, 0);
-            double tempPathCost = pathCost(tempPath);
-            //saving memory
-            // //adding to completePathsLL
-            // push(completePathsLL, tempPath);
-            #pragma omp critical(updateMin)
-            {
-            if (minCost>tempPathCost) {
-              minCost = tempPathCost;
-              //update minCost if it is less than the current known value
-   //             #pragma omp flush(minCost_shared)	//flush vs critical?
-              printPath(LOW, tempPath, FALSE);
-            }
-            }//critical
-          } else if (!pathEmpty(tempPath)) {
-            //#pragma omp parallel for schedule(dynamic) shared(minCost, tempPath, pvtPathsLL)
-            for (int b=n-1; b>0; b--) {
-              if (feasible(tempPath, b, minCost) == TRUE) {
-                struct Path* newPath = copyPath(tempPath);
-                addCity(newPath, b);
-      //          #pragma omp critical(updateStack)
-        //        {
-                push(pvtPathsLL, newPath);
-          //      }
-              }
-            }
-          
-          }	
-          freePath(tempPath);
-          //printPathsLL(verbosity, pathsLL);      
-        /*  #pragma omp critical
-          { 
-          counter--;
-          }
-         */ 
-        }//task
-   /*     #pragma omp critical
-        {
-        counter++;
-        }
-        }//if
-        else {
-          sleep(1);
-          cnprintf(FULL, "DFS", "delay");
-        }//else
-     */
-      }//while?
-    }//single?
-	}//parallel
+			int tempPathCityCount = numCities(tempPath);
+			if ( tempPathCityCount == n) {
+				//add 0th city for RTT time
+				addCity(tempPath, 0);
+				double tempPathCost = pathCost(tempPath);
+				//saving memory
+				// //adding to completePathsLL
+				// push(completePathsLL, tempPath);
+				if (minCost>tempPathCost) {
+					minCost = tempPathCost;
+					//update minCost if it is less than the current known value
+					if (minCost < minCost_shared) {
+						minCost_shared = minCost;
+						#pragma omp flush(minCost_shared)
+					}
+					//bestPath = tempPath;
+					//print only when new minCost is achieved
+					printPath(LOW, tempPath, FALSE);
+				}
+			} else {
+				//#pragma omp parallel for schedule(dynamic) shared(minCost, tempPath, pathsLL)
+				for (int b=n-1; b>0; b--) {
+					if (feasible(tempPath, b, minCost_shared) == TRUE) {
+						struct Path* newPath = copyPath(tempPath);
+						addCity(newPath, b);
+						push(pvtPathsLL, newPath);
+					}
+				}
+			
+			}	
+			freePath(tempPath);
+			//printPathsLL(verbosity, pathsLL);
+		}//while
+		
+		freePathLL(pvtPathsLL);
+
+	}
 	//saving memory
 	// //print all complete paths
 	// printPathsLL(verbosity, completePathsLL);
-	//freePathLL(pathsLL);
-	freePathLL(pvtPathsLL);
+	freePathLL(pathsLL);
 
 	//}
 
@@ -235,9 +218,9 @@ int main(int argc, char *argv[]) {
 	printf("Writing the output to log file:\t%s\n",outfile_name);
 	
 	//only change the size of buffer when debugging
-//	#if CVERBOSE > 1
+	#if CVERBOSE > 1
 	setBufSize(n);
-//	#endif
+	#endif
 
 	fprintf(outfile_fp, "Dataset file_name: %s\n", file_name);
 	fprintf(outfile_fp, "numCities: %d\n", n);
@@ -286,7 +269,7 @@ int main(int argc, char *argv[]) {
 	double wtime = omp_get_wtime ();
 	
 	minCost = DFS(LOW);
-//	stackSelfTest();
+	//stackSelfTest();
 	wtime = omp_get_wtime () - wtime;
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;

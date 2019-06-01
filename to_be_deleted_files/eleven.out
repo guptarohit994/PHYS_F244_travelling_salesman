@@ -1,0 +1,37 @@
+rm -f depthfirst_serial depthfirst_serial_recursion_dfs depthfirst_parallel;
+gcc -std=c99 -Werror -D_POSIX_SOURCE -o depthfirst_serial depthfirst_serial.c -lm
+gcc -std=c99 -Werror -D_POSIX_SOURCE -fopenmp -o depthfirst_parallel depthfirst_parallel.c -lm
+gcc -std=c99 -Werror -D_POSIX_SOURCE -o depthfirst_serial_recursion_dfs  depthfirst_serial_recursion_dfs.c -lm
+Currently in /home/roobee/project
+Using slurm job id 23653515
+
+Running dataset with 11 cities and dataset is at ./datasets/custom_11_d.txt
+
+threads	       	Average time (in seconds)
+=========================================
+1	       	2.555478
+=========================================
+2	       	5.445766
+=========================================
+3	       	4.421510
+=========================================
+4	       	4.821362
+=========================================
+5	       	4.469251
+=========================================
+6	       	4.605003
+=========================================
+7	       	4.687549
+=========================================
+8	       	4.831416
+=========================================
+9	       	5.209609
+=========================================
+10	       	5.286237
+=========================================
+11	       	5.319897
+=========================================
+12	       	5.821578
+=========================================
+13	       	5.655525
+=========================================
