@@ -245,7 +245,8 @@ double DFS(int verbosity) {
 						//update minCost if it is less than the current known value
 						if (minCost < minCost_shared) {
 							minCost_shared = minCost;
-							#pragma omp flush(minCost_shared)
+							//#pragma omp flush(minCost_shared)
+							//implicit flush at critical ending bracket
 						}
 					}
 					//bestPath = tempPath;
