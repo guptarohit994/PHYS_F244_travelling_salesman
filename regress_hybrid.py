@@ -16,7 +16,9 @@ def write_batch_script(file_name, ntasks, cpus, executable, dataset_path, cities
     f.write("#SBATCH --ntasks=" + str(ntasks) + "\n")
     f.write("#SBATCH --cpus-per-task=" + str(cpus) + "\n")
     f.write("#SBATCH --nodes=" + str(ntasks) + "\n")
-    if (cities > 15):
+    if (cities == 26):
+        f.write("#SBATCH --time=2-00:00" + "# time (D-HH:MM) \n")
+    elif (cities > 15):
         f.write("#SBATCH --time=0-10:00" + "# time (D-HH:MM) \n")
     else:
         f.write("#SBATCH --time=0-00:30" + "# time (D-HH:MM) \n")
@@ -144,8 +146,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.cities == None:
         args.cities = 5
-    if args.cities not in [5, 11, 15, 17]:
-        sys.exit("Error! We only have datasets with cities - 5, 11, 15, 17")
+    if args.cities not in [5, 11, 15, 17, 26]:
+        sys.exit("Error! We only have datasets with cities - 5, 11, 15, 17, 26")
     if args.iteration == None:
         args.iteration = 1
 
@@ -193,6 +195,11 @@ if __name__ == "__main__":
     datasets[17]['path'] = "./datasets/gr17_d.txt"
     #TODO this is not the serial time. Estimate it
     datasets[17]['serial_time'] = 7116.46887
+
+    datasets[26] = {}
+    datasets[26]['path'] = "./datasets/gr17_d.txt"
+    #TODO this is not the serial time. Estimate it
+    datasets[26]['serial_time'] = 158400
 
     dataset_path = datasets[cities]['path']
     serial_time = datasets[cities]['serial_time']
