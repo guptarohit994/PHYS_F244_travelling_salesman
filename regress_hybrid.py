@@ -99,6 +99,8 @@ def launch_commands(executable, iterations, dataset_path, cities, serial_time):
     run_dict['jobids'] = []
     for nt in range (1, cities):
         cpus = int(math.ceil((cities-1) * 1.0/nt))
+        #TODO handle if we get cpus > 24
+        continue;
 
         for i in range(1, iterations+1):
             file_name = executable + "_n" + str(nt) + "_c" + str(cpus) + "_i" + str(i)
@@ -197,7 +199,7 @@ if __name__ == "__main__":
     datasets[17]['serial_time'] = 7116.46887
 
     datasets[26] = {}
-    datasets[26]['path'] = "./datasets/gr17_d.txt"
+    datasets[26]['path'] = "./datasets/fri26_d.txt"
     #TODO this is not the serial time. Estimate it
     datasets[26]['serial_time'] = 158400
 
