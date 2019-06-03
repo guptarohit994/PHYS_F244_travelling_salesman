@@ -245,7 +245,8 @@ double DFS(int verbosity) {
 						//update minCost if it is less than the current known value
 						if (minCost < minCost_shared) {
 							minCost_shared = minCost;
-							//#pragma omp flush(minCost_shared)
+              MPI_Bcast(minCost_shared, 1, MPI_INT, taskID, MPI_COMM_WORLD);
+//							#pragma omp flush(minCost_shared)
 							//implicit flush at critical ending bracket
 						}
 					}
@@ -326,6 +327,7 @@ int main(int argc, char *argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD,&numTasks);
 	MPI_Comm_rank(MPI_COMM_WORLD,&taskID);
 	MPI_Get_processor_name(hostname, &len);
+  MPI_Request requests[numTasks];
 	printf ("MPI task %d has started on %s...\n", taskID, hostname);
 
 	char buf[15];

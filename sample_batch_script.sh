@@ -8,13 +8,7 @@
 #SBATCH -e %j.err # STDERR
 #SBATCH --mem 65536
 
-# mail alert at start, end and abortion of execution
-#SBATCH --mail-type=ALL
-
-# send mail to this address
-#SBATCH --mail-user=r4gupta@ucsd.edu
-
-cd /oasis/projects/nsf/csd453/r4gupta/PHY_F244_travelling_salesman/
+cd /oasis/projects/nsf/csd453/roobee
 make clean
 make
 ./run_multiple.sh depthfirst_parallel 15
