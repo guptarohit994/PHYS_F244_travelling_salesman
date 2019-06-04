@@ -66,7 +66,7 @@ def check_and_wait(run_dict, serial_time):
     count_not_done = len(run_dict['running'])
 
     while count_not_done > 0:
-        response = subprocess.run(["squeue", "-u", "roobee"], check=True, stdout=subprocess.PIPE,
+        response = subprocess.run(["squeue", "-u", "r4gupta"], check=True, stdout=subprocess.PIPE,
                                 universal_newlines=True)
         output = response.stdout
 
