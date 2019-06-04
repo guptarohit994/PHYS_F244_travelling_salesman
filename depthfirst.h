@@ -310,6 +310,7 @@ struct Path* pop(struct PathsLL* pathsLL)
 	//if pathsLL is empty
 	if (isEmpty(pathsLL)) {
 		//already empty
+		itemPopped = createPath();
 		cnprintf(FULL, "pop", "PathsLL is already empty");
 	} else if(pathsLL->next == NULL) {
 		//itemPopped = pathsLL->tour;
