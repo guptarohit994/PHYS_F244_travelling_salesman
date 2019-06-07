@@ -209,11 +209,31 @@ double DFS(int verbosity) {
 	omp_set_nested(1);
 	
 	#pragma omp parallel shared(pathsLL, bestPath, pathsPerThread, minCost_shared) \
-						 reduction(min:minCost) reduction(+:numCompletePaths)\
+						 reduction(+:numCompletePaths)\
 						 num_threads(numStartingThreads)
 	{
 		int threadID = omp_get_thread_num();
 		struct PathsLL* pvtPathsLL;
+
+		//all these variables only used by master thread. perhaps there is better way to initialize them?
+		int buffer = 0;	//buffer variable to store values
+		MPI_Request requests[numTasks];
+		//initialize requests
+		for(int i=0; i<numTasks; i++)
+			requests[i]=MPI_REQUEST_NULL;
+		const int taskDoneTag=23;	//arbitrary int so long as different from other tags
+		const int minCostTag=11;
+		double lastSharedMin=minCost_shared;	//most recent minCost_shared value that the tasks shared with each other
+		const double updRat=.9;	//if(minCost<updRat*lastSharedMin) it will be shared to the other tasks
+		const int recMess=10000; //if(count%=recMess == 0) check if any messages to be received
+		int sendFlag=0;	//MPI_Iprobe marks as 1 if message ready to be received
+		int counter=0;	//how many times while loop has happened
+		int tasksDone=0;	//# of tasks finished with their assigned stack
+		int finishedTasks[numTasks];	//marks which tasks finished, 1 is finished, 0 is not, index refers to taskID
+		//initialize
+		for(int i=0; i<numTasks; i++)
+			finishedTasks[i]=0;
+
 		#pragma omp critical
 		{
 			pvtPathsLL = get_my_share(pathsLL, threadID, pathsPerThread);
@@ -271,10 +291,88 @@ double DFS(int verbosity) {
 			}	
 			freePath(tempPath);
 			//printPathsLL(verbosity, pathsLL);
+
+			//need master since used FUNNELED
+			#pragma omp master
+			{
+				counter++;
+				counter%=recMess;
+
+				//receive all minCost updates when counter==0
+				if(counter==0) {
+					sendFlag=0;
+					while(!sendFlag) {
+						MPI_Iprobe(MPI_ANY_SOURCE, minCostTag, MPI_COMM_WORLD, &sendFlag, MPI_STATUS_IGNORE);	//must change if we ever use a shared partition
+						if(sendFlag) {
+							MPI_Recv(&minCost, 1, MPI_DOUBLE, MPI_ANY_SOURCE, minCostTag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+							if(minCost<minCost_shared) {
+								#pragma omp atomic write
+									minCost_shared=minCost;
+								lastSharedMin=minCost;
+							}
+							sendFlag=0;
+						} else {
+							minCost=minCost_shared;
+							sendFlag=1;
+						}
+					}
+				}
+
+				//when minCost<updRat*lastSharedMin update finished tasks and sent minCost to other tasks
+				if(minCost<updRat*lastSharedMin) {
+					//update which tasks are finished
+					sendFlag=0;
+					while(!sendFlag) {
+						MPI_Iprobe(MPI_ANY_SOURCE, taskDoneTag, MPI_COMM_WORLD, &sendFlag, MPI_STATUS_IGNORE);
+						if(sendFlag) {
+							MPI_Recv(&buffer, 1, MPI_INT, MPI_ANY_SOURCE, taskDoneTag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+							tasksDone++;
+							finishedTasks[buffer]=1;
+							sendFlag=0;
+						} else {
+							sendFlag=1;
+						}
+					}
+
+					//send new minCost to unfinished tasks
+					//what happens if two threads simultaneous send to each other?
+					//should I ensure system buffer (not buffer var) large enough to store numTasks doubles?
+					//if task finishes after you check for finishedTasks, than Isend will never resolve
+					for(int i=0; i<numTasks; i++)
+						if(i != taskID && finishedTasks[i] == 0)
+							MPI_Isend(&minCost, 1, MPI_DOUBLE, i, minCostTag, MPI_COMM_WORLD, &requests[i]);
+					lastSharedMin=minCost;
+					MPI_Waitall(numTasks, requests, MPI_STATUS_IGNORE);	//should I wait for all requests or only those that I checked? 
+				}
+			}//master
 		}//while
-		
 		freePathLL(pvtPathsLL);
-	}
+		#pragma omp master
+		{
+			//tell other tasks you are done so they will stop sending to you
+			//currently after master thread finishes it will stop helping the other threads to update minCost_shared from other tasks. consider fixing
+			if(tasksDone<numTasks-1) //don't send anything if you are the last task
+				for(int i=0; i<numTasks; i++)
+					if(i != taskID && finishedTasks[i]==0)
+						MPI_Send(&taskID, 1, MPI_INT, i, taskDoneTag, MPI_COMM_WORLD);	//consider replacing with Isend
+
+			//resolve all messages ready to be received
+			sendFlag=0;
+			while(!sendFlag) {	
+				MPI_Iprobe(MPI_ANY_SOURCE, minCostTag, MPI_COMM_WORLD, &sendFlag, MPI_STATUS_IGNORE);	//must change if we ever use a shared partition
+				if(sendFlag) {
+					MPI_Recv(&minCost, 1, MPI_DOUBLE, MPI_ANY_SOURCE, minCostTag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					sendFlag=0;
+					if(minCost<minCost_shared) {
+						#pragma omp atomic write
+							minCost_shared=minCost;
+					}
+				} else {
+						sendFlag=1;
+				}
+			}
+		}//master
+	}//parallel
 	printf("taskID:%d, Evaluated a total of %ld feasible complete paths.\n", taskID, numCompletePaths);
 	fprintf(outfile_fp, "taskID:%d, Evaluated a total of %ld feasible complete paths.\n", taskID, numCompletePaths);
 	//saving memory
@@ -285,8 +383,8 @@ double DFS(int verbosity) {
 	//}
 
 	//}
-	
-	return minCost;
+
+	return minCost_shared;
 }
 
 //main starts here
@@ -321,12 +419,16 @@ int main(int argc, char *argv[]) {
 	}
 	
 
+	int req_lvl=MPI_THREAD_FUNNELED;
+	int avail_lvl=-1;
 	/* Obtain number of tasks and task ID */
-	MPI_Init(&argc,&argv);
+//	MPI_Init(&argc,&argv);
+	MPI_Init_thread(&argc, &argv, req_lvl, &avail_lvl);
 	MPI_Comm_size(MPI_COMM_WORLD,&numTasks);
 	MPI_Comm_rank(MPI_COMM_WORLD,&taskID);
 	MPI_Get_processor_name(hostname, &len);
 	printf ("MPI task %d has started on %s...\n", taskID, hostname);
+	printf("MPI thread level? :%d\n", avail_lvl>=req_lvl);	//one means supported, 0 means not
 
 	char buf[15];
 	snprintf(buf, 15, "_%d.txt", taskID);
@@ -397,7 +499,7 @@ int main(int argc, char *argv[]) {
 	double minCostLocal = DFS(LOW);
 	
 	//send_data, receive_data, count of receive data, type of send_data, operation, root process number, communicator
-	rc = MPI_Reduce(&minCostLocal, &minCost, 1, MPI_DOUBLE, MPI_MIN, MASTER, MPI_COMM_WORLD);
+	rc = MPI_Reduce(&minCostLocal, &minCost, 1, MPI_DOUBLE, MPI_MIN, MASTER, MPI_COMM_WORLD);	//is minCost still defined outside of DFS???
 
 	MPI_Barrier(MPI_COMM_WORLD); /* IMPORTANT */
 	wtime = MPI_Wtime () - wtime;
