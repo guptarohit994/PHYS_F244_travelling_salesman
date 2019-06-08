@@ -225,7 +225,7 @@ double DFS(int verbosity) {
 		const int minCostTag=11;
 		double lastSharedMin=minCost_shared;	//most recent minCost_shared value that the tasks shared with each other
 		const double updRat=.9;	//if(minCost<updRat*lastSharedMin) it will be shared to the other tasks
-		const int recMess=10000; //if(count%=recMess == 0) check if any messages to be received
+		const int recMess=5; //if(count%=recMess == 0) check if any messages to be received
 		int sendFlag=0;	//MPI_Iprobe marks as 1 if message ready to be received
 		int counter=0;	//how many times while loop has happened
 		int tasksDone=0;	//# of tasks finished with their assigned stack
@@ -318,7 +318,6 @@ double DFS(int verbosity) {
 					}
 				}
 
-				//when minCost<updRat*lastSharedMin update finished tasks and sent minCost to other tasks
 				if(minCost<updRat*lastSharedMin) {
 					//update which tasks are finished
 					sendFlag=0;
@@ -333,7 +332,6 @@ double DFS(int verbosity) {
 							sendFlag=1;
 						}
 					}
-
 					//send new minCost to unfinished tasks
 					//what happens if two threads simultaneous send to each other?
 					//should I ensure system buffer (not buffer var) large enough to store numTasks doubles?
@@ -351,24 +349,22 @@ double DFS(int verbosity) {
 		{
 			//tell other tasks you are done so they will stop sending to you
 			//currently after master thread finishes it will stop helping the other threads to update minCost_shared from other tasks. consider fixing
-			if(tasksDone<numTasks-1) //don't send anything if you are the last task
+			if(tasksDone<numTasks)
 				for(int i=0; i<numTasks; i++)
-					if(i != taskID && finishedTasks[i]==0)
-						MPI_Send(&taskID, 1, MPI_INT, i, taskDoneTag, MPI_COMM_WORLD);	//consider replacing with Isend
-
+					if(i != taskID)
+						MPI_Isend(&taskID, 1, MPI_INT, i, taskDoneTag, MPI_COMM_WORLD, &requests[i]);
+			tasksDone++;
+			MPI_Waitall(numTasks, requests, MPI_STATUS_IGNORE);	//should I wait for all requests or only those that I checked?
+ 
 			//resolve all messages ready to be received
-			sendFlag=0;
-			while(!sendFlag) {	
+			while(tasksDone<numTasks) {	
 				MPI_Iprobe(MPI_ANY_SOURCE, minCostTag, MPI_COMM_WORLD, &sendFlag, MPI_STATUS_IGNORE);	//must change if we ever use a shared partition
-				if(sendFlag) {
+				if(sendFlag)
 					MPI_Recv(&minCost, 1, MPI_DOUBLE, MPI_ANY_SOURCE, minCostTag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-					sendFlag=0;
-					if(minCost<minCost_shared) {
-						#pragma omp atomic write
-							minCost_shared=minCost;
-					}
-				} else {
-						sendFlag=1;
+				MPI_Iprobe(MPI_ANY_SOURCE, taskDoneTag, MPI_COMM_WORLD, &sendFlag, MPI_STATUS_IGNORE);
+				if(sendFlag) {
+					MPI_Recv(&buffer, 1, MPI_INT, MPI_ANY_SOURCE, taskDoneTag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					tasksDone++;
 				}
 			}
 		}//master
