@@ -4,6 +4,7 @@
 #include <limits.h> 
 #include <time.h>
 #include <string.h>
+#include <omp.h>
 
 //verbosity levels
 #define LOW 1
@@ -320,16 +321,19 @@ int main(int argc, char *argv[]) {
 	int start = 0;
 	
 	startTime = clock();
+	double wtime = omp_get_wtime ();
 	
 	DFS(start, 0, start, stack, visited);
 	
+	wtime = omp_get_wtime () - wtime;
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
 	printf("=====================================\n");
 	printf("Lowest Cost:%.2f\n", minCost);
 	printf("There were %d possible paths.\n", competingPaths);
-	printf("\nTook %.10f seconds to execute\n", cpu_time_used);
+	printf ("\nWallclock time = %f\n", wtime );
+	printf("Took %.10f seconds to execute\n", cpu_time_used);
 
 
 	return 0; 

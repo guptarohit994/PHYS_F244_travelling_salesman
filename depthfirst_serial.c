@@ -1,4 +1,5 @@
 #include "depthfirst.h"
+#include <omp.h>
 
 int handle_option(char *arg) {
 	if (!strncmp(arg,"--dataset=",10)) {
@@ -216,10 +217,11 @@ int main(int argc, char *argv[]) {
 	int start = 0;
 	
 	startTime = clock();
+	double wtime = omp_get_wtime ();
 	
 	minCost = DFS(LOW);
-	//stackSelfTest();
 
+	wtime = omp_get_wtime () - wtime;
 	endTime = clock();
     cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
@@ -229,7 +231,8 @@ int main(int argc, char *argv[]) {
 	printf("Lowest Cost:%.2f\n", minCost);
 	fprintf(outfile_fp, "Lowest Cost:%.2f\n", minCost);
 	//printf("There were %d possible paths.\n", competingPaths);
-	printf("Wallclock time = %f\n", cpu_time_used);
+	printf ( "Wallclock time = %f\n", wtime );
+	fprintf (outfile_fp, "Wallclock time = %f\n", wtime );
 	fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
 
 	free(G);
