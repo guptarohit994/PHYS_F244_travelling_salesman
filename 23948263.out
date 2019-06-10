@@ -1,0 +1,42 @@
+rm -f depthfirst_serial depthfirst_serial_recursion_dfs depthfirst_parallel depthfirst_hybrid;
+gcc -std=c99 -Werror -D_POSIX_SOURCE -o depthfirst_serial depthfirst_serial.c -lm
+gcc -std=c99 -Werror -D_POSIX_SOURCE -fopenmp -o depthfirst_parallel depthfirst_parallel.c -lm
+gcc -std=c99 -Werror -D_POSIX_SOURCE -o depthfirst_serial_recursion_dfs  depthfirst_serial_recursion_dfs.c -lm
+mpicc -std=c99 -Werror -D_POSIX_SOURCE -fopenmp -o depthfirst_hybrid depthfirst_hybrid.c -lm
+args.cities: 11
+args.iteration: 1
+args.executable: depthfirst_hybrid
+--iteration argument is not supported yet. It defaults to 1 nevertheless
+currently in /oasis/projects/nsf/csd453/roobee
+
+Run the following command to cancel all the launched jobs - ./cancel_23948263.sh
+
+Sleeping for 30 seconds as 8 jobs are left:23948265 23948267 23948268 23948269 23948270 23948271 23948272 23948273
+Sleeping for 30 seconds as 4 jobs are left:23948267 23948269 23948271 23948273
+Sleeping for 30 seconds as 2 jobs are left:23948269 23948273
+Sleeping for 30 seconds as 1 jobs are left:23948273
+
+
+CONFIGURATION		RUNTIME(sec)		SPEEDUP
+========================================================================
+CORES:1,CPUS:10		2.435317		0.9714702439148579
+========================================================================
+CORES:2,CPUS:5		0.875209		2.7031691858744598
+========================================================================
+CORES:3,CPUS:4		0.639727		3.698199388176519
+========================================================================
+CORES:4,CPUS:3		0.483446		4.893696503849448
+========================================================================
+CORES:5,CPUS:2		0.350215		6.75538740487986
+========================================================================
+CORES:6,CPUS:2		0.697754		3.390647706784913
+========================================================================
+CORES:7,CPUS:2		0.553655		4.273126766668774
+========================================================================
+CORES:8,CPUS:2		0.335883		7.043637218912538
+========================================================================
+CORES:9,CPUS:2		0.298095		7.936523591472517
+========================================================================
+CORES:10,CPUS:1		0.171835		13.768079844036432
+========================================================================
+Cleaning up files - launch_scripts, output file for each node except 0

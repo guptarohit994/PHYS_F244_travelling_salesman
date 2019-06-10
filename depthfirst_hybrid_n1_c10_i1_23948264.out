@@ -1,0 +1,11 @@
+MPI task 0 has started on comet-06-08.sdsc.edu...
+MPI thread level? :1
+taskID:0, Writing the output to log file:	depthfirst_hybrid_n1_c10_i1_23948263_0.txt
+taskID:0, Number of processors available = 24
+taskID:0, Number of threads =              10
+taskID:0, totalNumThreads:10, numStartingThreads:10, numInitialPaths:10, pathsPerThread:1
+taskID:0, Evaluated a total of 69886 feasible complete paths.
+Lowest Cost:253.00
+Wallclock time = 2.435317
+
+Took 22.4000000000 seconds to execute

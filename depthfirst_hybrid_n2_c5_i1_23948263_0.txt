@@ -1,0 +1,106 @@
+taskID:0, Dataset file_name: ./datasets/custom_11_d.txt
+taskID:0, numCities: 11
+taskID:0, Number of processors available = 24
+taskID:0, Number of threads =              5
+printAdjacencyMatrix: printing Matrix
+	 0.00	 29.00	 20.00	 21.00	 16.00	 31.00	 100.00	 12.00	 4.00	 31.00	 18.00
+	 29.00	 0.00	 15.00	 29.00	 28.00	 40.00	 72.00	 21.00	 29.00	 41.00	 12.00
+	 20.00	 15.00	 0.00	 15.00	 14.00	 25.00	 81.00	 9.00	 23.00	 27.00	 13.00
+	 21.00	 29.00	 15.00	 0.00	 4.00	 12.00	 92.00	 12.00	 25.00	 13.00	 25.00
+	 16.00	 28.00	 14.00	 4.00	 0.00	 16.00	 94.00	 9.00	 20.00	 16.00	 22.00
+	 31.00	 40.00	 25.00	 12.00	 16.00	 0.00	 95.00	 24.00	 36.00	 3.00	 37.00
+	 100.00	 72.00	 81.00	 92.00	 94.00	 95.00	 0.00	 90.00	 101.00	 99.00	 84.00
+	 12.00	 21.00	 9.00	 12.00	 9.00	 24.00	 90.00	 0.00	 15.00	 25.00	 13.00
+	 4.00	 29.00	 23.00	 25.00	 20.00	 36.00	 101.00	 15.00	 0.00	 35.00	 18.00
+	 31.00	 41.00	 27.00	 13.00	 16.00	 3.00	 99.00	 25.00	 35.00	 0.00	 38.00
+	 18.00	 12.00	 13.00	 25.00	 22.00	 37.00	 84.00	 13.00	 18.00	 38.00	 0.00
+
+taskID:0, totalNumThreads:5, numStartingThreads:5, numInitialPaths:5, pathsPerThread:1
+get_my_share: Starting from threadID = 0
+get_my_share: threadID:numPathsAvailable = 0:5
+get_my_share: threadID:pathsPerThread = 0:1
+get_my_share: threadID:pathsAllocated = 0:1
+get_my_share: Ending from threadID = 0
+get_my_share: Starting from threadID = 1
+get_my_share: threadID:numPathsAvailable = 1:4
+get_my_share: threadID:pathsPerThread = 1:1
+get_my_share: threadID:pathsAllocated = 1:1
+get_my_share: Ending from threadID = 1
+get_my_share: Starting from threadID = 2
+get_my_share: threadID:numPathsAvailable = 2:3
+get_my_share: threadID:pathsPerThread = 2:1
+get_my_share: threadID:pathsAllocated = 2:1
+get_my_share: Ending from threadID = 2
+get_my_share: Starting from threadID = 3
+get_my_share: threadID:numPathsAvailable = 3:2
+get_my_share: threadID:pathsPerThread = 3:1
+get_my_share: threadID:pathsAllocated = 3:1
+get_my_share: Ending from threadID = 3
+printPath: Printing path =>
+get_my_share: Starting from threadID = 4
+get_my_share: threadID:numPathsAvailable = 4:1
+get_my_share: threadID:pathsPerThread = 4:1
+ 0(0.00) -> 6(100.00) -> 1(172.00) -> 2(187.00)get_my_share: threadID:pathsAllocated = 4:1
+get_my_share: Ending from threadID = 4
+printPath: Printing path =>
+ 0(0.00) -> 7(12.00) -> 1(33.00) -> 2(48.00) -> -> 3(202.00)printPath: Printing path =>
+ -> 4(206.00) -> 0(0.00) -> 8(4.00) -> 1(33.00) -> 2(48.00) 5(222.00) -> 3(63.00) -> 4(67.00) -> 3(63.00)printPath: Printing path =>
+ -> 7(246.00) 0(0.00) 4(67.00)printPath: Printing path =>
+ -> 5(83.00) 0(0.00) -> 10(18.00) -> -> -> 5(83.00) -> 8(261.00) -> -> 9(296.00) 6(178.00) -> -> 6(178.00) -> 9(277.00) 1(30.00) -> 8(312.00) -> 10(330.00) 9(31.00) 10(334.00) -> 1(72.00) -> -> -> 2(45.00) 9(277.00) -> 3(60.00) 0(352.00) -> ->
+ -> 4(64.00) 2(87.00) -> -> 5(80.00) 3(102.00) -> -> -> 6(175.00) 4(106.00) 0(348.00) 7(302.00)
+printPath: Done
+ -> -> 10(315.00) -> 0(333.00) ->
+printPath: Done
+ 7(265.00)printPath: Done
+ -> 9(290.00) -> 8(325.00) 5(122.00) -> 6(217.00) -> -> 7(307.00) -> 10(320.00) 0(329.00)
+printPath: Done
+ -> 8(338.00) -> 0(342.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 7(12.00) -> 1(33.00) -> 2(48.00) -> 3(63.00) -> 4(67.00) -> 5(83.00) -> 9(86.00) -> 6(185.00) -> 8(286.00) -> 10(304.00) -> 0(322.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 7(12.00) -> 1(33.00) -> 2(48.00) -> 3(63.00) -> 4(67.00) -> 5(83.00) -> 9(86.00) -> 6(185.00) -> 10(269.00) -> 8(287.00) -> 0(291.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 6(100.00) -> 1(172.00) -> 2(187.00) -> 3(202.00) -> 4(206.00) -> 5(222.00) -> 9(225.00) -> 7(250.00) -> 10(263.00) -> 8(281.00) -> 0(285.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 6(100.00) -> 1(172.00) -> 2(187.00) -> 3(202.00) -> 4(206.00) -> 9(222.00) -> 5(225.00) -> 7(249.00) -> 10(262.00) -> 8(280.00) -> 0(284.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 6(100.00) -> 1(172.00) -> 2(187.00) -> 3(202.00) -> 5(214.00) -> 9(217.00) -> 4(233.00) -> 7(242.00) -> 10(255.00) -> 8(273.00) -> 0(277.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 6(100.00) -> 1(172.00) -> 2(187.00) -> 5(212.00) -> 9(215.00) -> 3(228.00) -> 4(232.00) -> 7(241.00) -> 10(254.00) -> 8(272.00) -> 0(276.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 10(18.00) -> 1(30.00) -> 2(45.00) -> 6(126.00) -> 5(221.00) -> 9(224.00) -> 3(237.00) -> 4(241.00) -> 7(250.00) -> 8(265.00) -> 0(269.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 10(18.00) -> 1(30.00) -> 6(102.00) -> 2(183.00) -> 3(198.00) -> 4(202.00) -> 5(218.00) -> 9(221.00) -> 7(246.00) -> 8(261.00) -> 0(265.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 10(18.00) -> 1(30.00) -> 6(102.00) -> 2(183.00) -> 3(198.00) -> 4(202.00) -> 9(218.00) -> 5(221.00) -> 7(245.00) -> 8(260.00) -> 0(264.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 10(18.00) -> 1(30.00) -> 6(102.00) -> 2(183.00) -> 3(198.00) -> 5(210.00) -> 9(213.00) -> 4(229.00) -> 7(238.00) -> 8(253.00) -> 0(257.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 10(18.00) -> 1(30.00) -> 6(102.00) -> 2(183.00) -> 5(208.00) -> 9(211.00) -> 3(224.00) -> 4(228.00) -> 7(237.00) -> 8(252.00) -> 0(256.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 7(12.00) -> 4(21.00) -> 3(25.00) -> 5(37.00) -> 9(40.00) -> 2(67.00) -> 6(148.00) -> 1(220.00) -> 10(232.00) -> 8(250.00) -> 0(254.00)
+printPath: Done
+printPath: Printing path =>
+ 0(0.00) -> 7(12.00) -> 4(21.00) -> 3(25.00) -> 9(38.00) -> 5(41.00) -> 2(66.00) -> 6(147.00) -> 1(219.00) -> 10(231.00) -> 8(249.00) -> 0(253.00)
+printPath: Done
+taskID:0, Evaluated a total of 39438 feasible complete paths.
+
+
+
+=====================================
+Lowest Cost:253.00
+Wallclock time = 0.875209
+
+Took 4.2300000000 seconds to execute

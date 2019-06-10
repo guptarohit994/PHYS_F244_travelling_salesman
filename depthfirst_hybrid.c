@@ -225,7 +225,7 @@ double DFS(int verbosity) {
 		const int minCostTag=11;
 		double lastSharedMin=minCost_shared;	//most recent minCost_shared value that the tasks shared with each other
 		const double updRat=.9;	//if(minCost<updRat*lastSharedMin) it will be shared to the other tasks
-		const int recMess=5; //if(count%=recMess == 0) check if any messages to be received
+		const int recMess=500; //if(count%=recMess == 0) check if any messages to be received
 		int sendFlag=0;	//MPI_Iprobe marks as 1 if message ready to be received
 		int counter=0;	//how many times while loop has happened
 		int tasksDone=0;	//# of tasks finished with their assigned stack

@@ -1,0 +1,53 @@
+MPI task 0 has started on comet-12-23.sdsc.edu...
+MPI thread level? :1
+taskID:0, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_0.txt
+MPI task 2 has started on comet-12-25.sdsc.edu...
+MPI thread level? :1
+MPI task 3 has started on comet-12-26.sdsc.edu...
+MPI thread level? :1
+MPI task 1 has started on comet-12-24.sdsc.edu...
+MPI thread level? :1
+MPI task 5 has started on comet-12-28.sdsc.edu...
+MPI thread level? :1
+MPI task 4 has started on comet-12-27.sdsc.edu...
+MPI thread level? :1
+MPI task 6 has started on comet-12-29.sdsc.edu...
+MPI thread level? :1
+taskID:0, Number of processors available = 24
+taskID:0, Number of threads =              2
+taskID:2, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_2.txt
+taskID:3, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_3.txt
+taskID:1, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_1.txt
+taskID:5, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_5.txt
+taskID:4, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_4.txt
+taskID:6, Writing the output to log file:	depthfirst_hybrid_n7_c2_i1_23948263_6.txt
+taskID:2, Number of processors available = 24
+taskID:2, Number of threads =              2
+taskID:3, Number of processors available = 24
+taskID:3, Number of threads =              2
+taskID:6, Number of processors available = 24
+taskID:6, Number of threads =              2
+taskID:1, Number of processors available = 24
+taskID:1, Number of threads =              2
+taskID:5, Number of processors available = 24
+taskID:5, Number of threads =              2
+taskID:4, Number of processors available = 24
+taskID:4, Number of threads =              2
+taskID:0, totalNumThreads:2, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:2, totalNumThreads:2, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:1, totalNumThreads:2, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:5, totalNumThreads:2, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:4, totalNumThreads:2, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:3, totalNumThreads:2, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:6, totalNumThreads:2, numStartingThreads:2, numInitialPaths:4, pathsPerThread:2
+taskID:0, Evaluated a total of 8849 feasible complete paths.
+taskID:3, Evaluated a total of 8920 feasible complete paths.
+taskID:1, Evaluated a total of 4975 feasible complete paths.
+taskID:4, Evaluated a total of 83 feasible complete paths.
+taskID:2, Evaluated a total of 20374 feasible complete paths.
+taskID:5, Evaluated a total of 4889 feasible complete paths.
+taskID:6, Evaluated a total of 24364 feasible complete paths.
+Lowest Cost:253.00
+Wallclock time = 0.553655
+
+Took 0.6600000000 seconds to execute
