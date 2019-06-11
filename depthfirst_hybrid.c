@@ -487,7 +487,7 @@ int main(int argc, char *argv[]) {
 
 	int start = 0;
 	
-	startTime = clock();
+	//startTime = clock();
 	MPI_Barrier(MPI_COMM_WORLD); /* IMPORTANT */
 	double wtime = MPI_Wtime();
 	//printf("start time:%f\n", wtime);
@@ -500,8 +500,8 @@ int main(int argc, char *argv[]) {
 	MPI_Barrier(MPI_COMM_WORLD); /* IMPORTANT */
 	wtime = MPI_Wtime () - wtime;
 	//printf("total time:%f\n", wtime);
-	endTime = clock();
-    cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
+	//endTime = clock();
+    //cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
     fprintf(outfile_fp, "\n\n\n");
 	fprintf(outfile_fp, "=====================================\n");
@@ -515,8 +515,8 @@ int main(int argc, char *argv[]) {
 		fprintf (outfile_fp, "Wallclock time = %f\n", wtime );
 		
 		//following will show the time taken by each used core * num cores used
-		printf("\nTook %.10f seconds to execute\n", cpu_time_used);
-		fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
+		//printf("\nTook %.10f seconds to execute\n", cpu_time_used);
+		//fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
 	}
 
 	free(G);

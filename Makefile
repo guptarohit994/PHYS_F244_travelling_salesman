@@ -13,6 +13,9 @@ depthfirst_serial_recursion_dfs:
 depthfirst_parallel: 
 	$(CC) $(OPTS) -fopenmp -o depthfirst_parallel depthfirst_parallel.c -lm
 
+tsp_greedy:
+	$(CC) $(OPTS) -o tsp_greedy tsp_greedy.c -lm
+
 depthfirst_hybrid:
 	$(MPICC) $(OPTS) -fopenmp -o depthfirst_hybrid depthfirst_hybrid.c -lm
 

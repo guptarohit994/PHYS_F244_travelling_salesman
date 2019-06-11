@@ -31,27 +31,12 @@ DATASET_PATH="./datasets/lau15_dist_15c_d.txt"
 if [ $CITIES -eq 5 ]
 then
     DATASET_PATH="./datasets/five_d.txt"
-elif [[ ( $CITIES -gt 5 ) && ( $CITIES -lt 11 ) ]]
-then
-    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 elif [ $CITIES -eq 11 ]
 then
     DATASET_PATH="./datasets/custom_11_d.txt"
-elif [[ ( $CITIES -gt 11 ) && ( $CITIES -lt 15 ) ]]
-then
-    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 elif [ $CITIES -eq 15 ]
 then
     DATASET_PATH="./datasets/lau15_dist_15c_d.txt"
-elif [ $CITIES -eq 16 ]
-then
-    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
-elif [ $CITIES -eq 17 ]
-then
-    DATASET_PATH="./datasets/gr17_d.txt"
-elif [[ ( $CITIES -gt 17 ) && ( $CITIES -lt 19 ) ]]
-then
-    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 fi
 
 OUTFILE_PATH="${EXECUTABLE}_${SLURM_JOB_ID}.txt"
@@ -59,23 +44,32 @@ declare -a AVERAGE
 
 echo "Running dataset with ${CITIES} cities and dataset is at ${DATASET_PATH}"
 
-echo -e "\nthreads\t       \tAv time (in seconds)    Speedup over serial (times)"
+MAX_NTASKS=$(echo "$CITIES - 1" | bc)
+echo -e "\nntasks:cpus-per-task\t       \tAv time (in seconds)    Speedup over serial (times)"
 echo "==================================================================="
-for threads in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+
+ntasks=1
+while [ $MAX_NTASKS -ge $ntasks ]
 do
     SUM=0
-    for i in {1..10}
+    CPUS=$(echo "a=$MAX_NTASKS; b=$ntasks; if ( a%b ) a/b+1 else a/b" | bc)
+    for i in {1..2}
     do
-        TIME_TAKEN=`export OMP_NUM_THREADS=$threads; ./$EXECUTABLE --dataset="$DATASET_PATH" --cities="$CITIES" --outfile="$OUTFILE_PATH" | grep -i wallclock | cut -d = -f2 | cut -d ' ' -f2`
-        #echo "TIME_TAKEN=$TIME_TAKEN"
+        printf "ntasks:%d\n" "$ntasks"
+        printf "cpus:%d\n" "$CPUS"
+        #TEMP=`./heated_plate_openmp`
+        #echo $TEMP
+        TIME_TAKEN=`export OMP_NUM_THREADS=$CPUS; export MV2_ENABLE_AFFINITY=0; srun --pty --ntasks=$ntasks --cpus-per-task=$CPUS --nodes=$ntasks -p compute -t 00:30:00 --wait 0 mpirun ./$EXECUTABLE --dataset="$DATASET_PATH" --cities="$CITIES" --outfile="$OUTFILE_PATH" | grep -i wallclock | cut -d = -f2 | cut -d ' ' -f2`
+        echo "TIME_TAKEN=$TIME_TAKEN"
         SUM=$(echo "$TIME_TAKEN + $SUM" | bc)
     done
 
     #echo "sum=$SUM"
-    AVERAGE[$threads]=$(echo "scale = 6; $SUM / 10" | bc)
-    SPEEDUP=$(echo "scale = 2; ${AVERAGE[1]} / ${AVERAGE[$threads]}" | bc)
-    printf "%d\t    \t%.6f\t  \t%.2f\n" "$threads" "${AVERAGE[$threads]}" "$SPEEDUP"
+    AVERAGE[$ntasks]=$(echo "scale = 6; $SUM / 10" | bc)
+    SPEEDUP=$(echo "scale = 2; ${AVERAGE[1]} / ${AVERAGE[$ntasks]}" | bc)
+    printf "%d:%d\t    \t%.6f\t  \t%.2f\n" "$ntasks" "$CPUS" "${AVERAGE[$ntasks]}" "$SPEEDUP"
     #echo -e "$threads\t       \t{$AVERAGE[$threads]}\t      \t$SPEEDUP"
     echo "==================================================================="
+    true $(( ntasks++ ))
 done
 

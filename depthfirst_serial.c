@@ -186,12 +186,6 @@ int main(int argc, char *argv[]) {
 	
 	G = (double*) malloc(n * n * sizeof(double)); 
 
-	// //replicate across the diagonal
-	// for (int i = 0; i<n; i++) {
-	// 	for (int j = i; j<n; j++) {
-	// 		G[j][i] = G[i][j];
-	// 	}
-	// }
     char ch;
    	FILE *input_fp;
     input_fp = fopen(file_name, "r"); // read mode
@@ -216,14 +210,14 @@ int main(int argc, char *argv[]) {
 
 	int start = 0;
 	
-	startTime = clock();
+	//startTime = clock();
 	double wtime = omp_get_wtime ();
 	
 	minCost = DFS(LOW);
 
 	wtime = omp_get_wtime () - wtime;
-	endTime = clock();
-    cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
+	//endTime = clock();
+    //cpu_time_used = ((double) (endTime - startTime)) / CLOCKS_PER_SEC;
 
     fprintf(outfile_fp, "\n\n\n");
 	fprintf(outfile_fp, "=====================================\n");
@@ -233,7 +227,7 @@ int main(int argc, char *argv[]) {
 	//printf("There were %d possible paths.\n", competingPaths);
 	printf ( "Wallclock time = %f\n", wtime );
 	fprintf (outfile_fp, "Wallclock time = %f\n", wtime );
-	fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
+	//fprintf(outfile_fp, "\nTook %.10f seconds to execute\n", cpu_time_used);
 
 	free(G);
 	fclose(outfile_fp);

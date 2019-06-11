@@ -8,14 +8,14 @@ import re
 import copy
 import json
 
-def write_batch_script(file_name, nodes_required, ntasks, ntasks_per_node, cpus, executable, dataset_path, cities):
+def write_batch_script(file_name, ntasks, cpus, executable, dataset_path, cities):
     f = open(file_name + ".sh", "w+")
     f.write("#!/bin/bash\n")
     f.write("#SBATCH -p compute # partition (queue)\n")
     f.write("#SBATCH --job-name=" + file_name + "\n")
-    f.write("#SBATCH -N " + str(nodes_required) + "\n")
-    f.write("#SBATCH -n " + str(ntasks_per_node) + "\n")
-    
+    f.write("#SBATCH --ntasks=" + str(ntasks) + "\n")
+    f.write("#SBATCH --cpus-per-task=" + str(cpus) + "\n")
+    f.write("#SBATCH --nodes=" + str(ntasks) + "\n")
     if (cities == 26):
         f.write("#SBATCH --time=2-00:00" + "# time (D-HH:MM) \n")
     elif (cities > 15):
@@ -29,8 +29,7 @@ def write_batch_script(file_name, nodes_required, ntasks, ntasks_per_node, cpus,
     f.write("export OMP_NUM_THREADS=" + str(cpus) + "\n")
     f.write("export MV2_ENABLE_AFFINITY=0" + "\n")
 
-    ibrun_npernode = int(ntasks/nodes_required)
-    command = "ibrun --npernode " + str(ibrun_npernode) + " ./" + executable + " --dataset=" + dataset_path + " --cities=" + str(cities) + \
+    command = "mpirun ./" + executable + " --dataset=" + dataset_path + " --cities=" + str(cities) + \
                 " --outfile=" + file_name + "_" + str(slurm_job_id)
     #print(command)
     f.write(command + "\n")
@@ -99,24 +98,15 @@ def check_and_wait(run_dict, serial_time):
 def launch_commands(executable, iterations, dataset_path, cities, serial_time):
     run_dict = {}
     run_dict['jobids'] = []
-    
-    nodes_req_default = 1
-    # compute max nodes that can be required
-    nodes_req_max = int(math.ceil((cities-2) * 2.0/24))
-
     for nt in range (1, cities):
         cpus = int(math.ceil((cities-1) * 1.0/nt))
-
         if cpus > 24:
             print("Skipping nt:" + str(nt) + ", cpus:" + str(cpus))
             continue
 
-        nodes_req = int(math.ceil(nt * cpus * 1.0 / 24))
-        nt_per_node = 24 if (cpus * nt > 24) else (cpus * nt)
-
         for i in range(1, iterations+1):
             file_name = executable + "_n" + str(nt) + "_c" + str(cpus) + "_i" + str(i)
-            write_batch_script(file_name, nodes_req, nt, nt_per_node, cpus, executable, dataset_path, cities)
+            write_batch_script(file_name, nt, cpus, executable, dataset_path, cities)
             try:
                 response = subprocess.run(["sbatch", file_name + ".sh"], check=True, stdout=subprocess.PIPE, universal_newlines=True)
             except subprocess.CalledProcessError:
@@ -139,7 +129,7 @@ def launch_commands(executable, iterations, dataset_path, cities, serial_time):
             run_dict['jobids'].append(jobid)
             time.sleep(1)
 
-            response = subprocess.run(["scancel", str(jobid)])
+            #response = subprocess.run(["scancel", str(jobid)])
     #print(run_dict)
     cancel_fd.close()
     check_and_wait(run_dict, serial_time)
@@ -160,7 +150,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.cities == None:
         args.cities = 5
-    if args.cities not in [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,16, 17, 18, 19, 20, 26]:
+    if args.cities not in [5, 11, 15, 17, 26]:
         sys.exit("Error! We only have datasets with cities - 5, 11, 15, 17, 26")
     if args.iteration == None:
         args.iteration = 1
