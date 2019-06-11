@@ -185,25 +185,42 @@ if __name__ == "__main__":
     datasets = {}
     datasets[5] = {}
     datasets[5]['path'] = "./datasets/five_d.txt"
-    datasets[5]['serial_time'] = 0.000059
-
+    
     datasets[11] = {}
     datasets[11]['path'] = "./datasets/custom_11_d.txt"
-    datasets[11]['serial_time'] = 2.365838
 
     datasets[15] = {}
     datasets[15]['path'] = "./datasets/lau15_dist_15c_d.txt"
-    datasets[15]['serial_time'] = 145.732252
 
     datasets[17] = {}
     datasets[17]['path'] = "./datasets/gr17_d.txt"
-    #TODO this is not the serial time. Estimate it
-    datasets[17]['serial_time'] = 7116.46887
 
     datasets[26] = {}
     datasets[26]['path'] = "./datasets/fri26_d.txt"
     #TODO this is not the serial time. Estimate it
     datasets[26]['serial_time'] = 158400
+
+    for cityCount in [6,7,8,9,10,12,13,14,16,18,19,20]:
+        datasets[cityCount] = {}
+        datasets[cityCount]['path'] = "./datasets/fri" + str(cityCount) + "_d.txt"
+
+    datasets[5]['serial_time'] = 0.000113
+    datasets[6]['serial_time'] = 0.000214
+    datasets[7]['serial_time'] = 0.001104
+    datasets[8]['serial_time'] = 0.005972
+    datasets[9]['serial_time'] = 0.031513
+    datasets[10]['serial_time'] = 0.156429
+    datasets[11]['serial_time'] = 2.310246
+    datasets[12]['serial_time'] = 2.23331
+    datasets[13]['serial_time'] = 10.233092
+    datasets[14]['serial_time'] = 107.936081
+    datasets[15]['serial_time'] = 153.800294
+    datasets[16]['serial_time'] = 6471.245587
+    #TODO update them
+    datasets[17]['serial_time'] = 6471.245587
+    datasets[18]['serial_time'] = 6471.245587
+    datasets[19]['serial_time'] = 6471.245587
+    datasets[20]['serial_time'] = 6471.245587
 
     dataset_path = datasets[cities]['path']
     serial_time = datasets[cities]['serial_time']

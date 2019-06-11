@@ -31,12 +31,27 @@ DATASET_PATH="./datasets/lau15_dist_15c_d.txt"
 if [ $CITIES -eq 5 ]
 then
     DATASET_PATH="./datasets/five_d.txt"
+elif [[ ( $CITIES -gt 5 ) && ( $CITIES -lt 11 ) ]]
+then
+    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 elif [ $CITIES -eq 11 ]
 then
     DATASET_PATH="./datasets/custom_11_d.txt"
+elif [[ ( $CITIES -gt 11 ) && ( $CITIES -lt 15 ) ]]
+then
+    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 elif [ $CITIES -eq 15 ]
 then
     DATASET_PATH="./datasets/lau15_dist_15c_d.txt"
+elif [ $CITIES -eq 16 ]
+then
+    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
+elif [ $CITIES -eq 17 ]
+then
+    DATASET_PATH="./datasets/gr17_d.txt"
+elif [[ ( $CITIES -gt 17 ) && ( $CITIES -lt 19 ) ]]
+then
+    DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 fi
 
 OUTFILE_PATH="${EXECUTABLE}_${SLURM_JOB_ID}.txt"
