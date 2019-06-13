@@ -1,0 +1,50 @@
+Mon Jun 10 18:30:30 PDT 2019
+cities=5
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 12 feasible complete paths. Lowest Cost:19.00 Wallclock time = 0.000113
+------------------
+Mon Jun 10 18:30:30 PDT 2019
+cities=6
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 79 feasible complete paths. Lowest Cost:291.00 Wallclock time = 0.000214
+------------------
+Mon Jun 10 18:30:30 PDT 2019
+cities=7
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 354 feasible complete paths. Lowest Cost:343.00 Wallclock time = 0.001104
+------------------
+Mon Jun 10 18:30:30 PDT 2019
+cities=8
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 1012 feasible complete paths. Lowest Cost:391.00 Wallclock time = 0.005972
+------------------
+Mon Jun 10 18:30:30 PDT 2019
+cities=9
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 2262 feasible complete paths. Lowest Cost:401.00 Wallclock time = 0.031513
+------------------
+Mon Jun 10 18:30:31 PDT 2019
+cities=10
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 3660 feasible complete paths. Lowest Cost:413.00 Wallclock time = 0.156429
+------------------
+Mon Jun 10 18:30:31 PDT 2019
+cities=11
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 76442 feasible complete paths. Lowest Cost:253.00 Wallclock time = 2.310246
+------------------
+Mon Jun 10 18:30:33 PDT 2019
+cities=12
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 3431 feasible complete paths. Lowest Cost:441.00 Wallclock time = 2.233310
+------------------
+Mon Jun 10 18:30:35 PDT 2019
+cities=13
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 9164 feasible complete paths. Lowest Cost:445.00 Wallclock time = 10.233092
+------------------
+Mon Jun 10 18:30:46 PDT 2019
+cities=14
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 69530 feasible complete paths. Lowest Cost:472.00 Wallclock time = 107.936081
+------------------
+Mon Jun 10 18:32:33 PDT 2019
+cities=15
+Writing the output to log file: ./depthfirst_serial_out.txt Evaluated a total of 4258 feasible complete paths. Lowest Cost:291.00 Wallclock time = 153.800294
+------------------
+cities=16
+Writing the output to log file:	./depthfirst_serial_out.txt Evaluated a total of 360849 feasible complete paths. Lowest Cost:527.00 Wallclock time = 6471.245587
+------------------
+cities=17
+Writing the output to log file:	./depthfirst_serial_out.txt Evaluated a total of 484396 feasible complete paths. Lowest Cost:2085.00 Wallclock time = 59900.223725
+------------------

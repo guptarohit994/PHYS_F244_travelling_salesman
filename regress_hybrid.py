@@ -117,6 +117,8 @@ def launch_commands(executable, iterations, dataset_path, cities, serial_time):
         for i in range(1, iterations+1):
             file_name = executable + "_n" + str(nt) + "_c" + str(cpus) + "_i" + str(i)
             write_batch_script(file_name, nodes_req, nt, nt_per_node, cpus, executable, dataset_path, cities)
+            if (args.dryrun > 0):
+                continue
             try:
                 response = subprocess.run(["sbatch", file_name + ".sh"], check=True, stdout=subprocess.PIPE, universal_newlines=True)
             except subprocess.CalledProcessError:
@@ -141,6 +143,8 @@ def launch_commands(executable, iterations, dataset_path, cities, serial_time):
 
             response = subprocess.run(["scancel", str(jobid)])
     #print(run_dict)
+    if args.dryrun > 0:
+        sys.exit("Dry run complete.")
     cancel_fd.close()
     check_and_wait(run_dict, serial_time)
 
@@ -151,9 +155,11 @@ if __name__ == "__main__":
     parser.add_argument('--executable', type=str, nargs='+', required=True,
                         help='Executable to use')
     parser.add_argument('--cities', type=int,
-                        help='Dataset to use:5')
+                        help='#city Dataset to use')
     parser.add_argument('--iteration', type=int, nargs='?',const=5,
                         help='Iterations per configuration, default:5')
+    parser.add_argument('--dryrun', type=int, nargs='?',const=0,
+                        help='Dry run. Generate scripts but do not launch, Can be 0 or 1. default:0')
 
 
 
@@ -164,6 +170,8 @@ if __name__ == "__main__":
         sys.exit("Error! We only have datasets with cities - 5, 11, 15, 17, 26")
     if args.iteration == None:
         args.iteration = 1
+    if args.dryrun == None or args.dryrun < 0:
+        args.dryrun = 0
 
     print("args.cities:", args.cities)
     print("args.iteration:", args.iteration)

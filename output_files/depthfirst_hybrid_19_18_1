@@ -1,0 +1,131 @@
+Your job geometry appears to suggest that you want 0 threads per MPI rank, but your OMP_NUM_THREADS is 1.  This will cause thread binding to be disabled.
+MPI task 12 has started on comet-17-16.sdsc.edu...
+MPI task 7 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI thread level? :1
+MPI task 3 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI task 13 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI task 6 has started on comet-17-16.sdsc.edu...
+MPI task 15 has started on comet-17-16.sdsc.edu...
+MPI task 0 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI thread level? :1
+MPI thread level? :1
+MPI task 9 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI task 8 has started on comet-17-16.sdsc.edu...
+MPI task 1 has started on comet-17-16.sdsc.edu...
+MPI task 2 has started on comet-17-16.sdsc.edu...
+MPI task 10 has started on comet-17-16.sdsc.edu...
+MPI task 16 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI task 11 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI task 5 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI task 17 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI thread level? :1
+MPI task 4 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+MPI thread level? :1
+MPI thread level? :1
+MPI thread level? :1
+MPI task 14 has started on comet-17-16.sdsc.edu...
+MPI thread level? :1
+taskID:12, Writing the output to log file:	depthfirst_hybrid_19_23969079_12.txt
+taskID:7, Writing the output to log file:	depthfirst_hybrid_19_23969079_7.txt
+taskID:3, Writing the output to log file:	depthfirst_hybrid_19_23969079_3.txt
+taskID:13, Writing the output to log file:	depthfirst_hybrid_19_23969079_13.txt
+taskID:0, Writing the output to log file:	depthfirst_hybrid_19_23969079_0.txt
+taskID:15, Writing the output to log file:	depthfirst_hybrid_19_23969079_15.txt
+taskID:6, Writing the output to log file:	depthfirst_hybrid_19_23969079_6.txt
+taskID:9, Writing the output to log file:	depthfirst_hybrid_19_23969079_9.txt
+taskID:8, Writing the output to log file:	depthfirst_hybrid_19_23969079_8.txt
+taskID:1, Writing the output to log file:	depthfirst_hybrid_19_23969079_1.txt
+taskID:2, Writing the output to log file:	depthfirst_hybrid_19_23969079_2.txt
+taskID:10, Writing the output to log file:	depthfirst_hybrid_19_23969079_10.txt
+taskID:16, Writing the output to log file:	depthfirst_hybrid_19_23969079_16.txt
+taskID:5, Writing the output to log file:	depthfirst_hybrid_19_23969079_5.txt
+taskID:17, Writing the output to log file:	depthfirst_hybrid_19_23969079_17.txt
+taskID:11, Writing the output to log file:	depthfirst_hybrid_19_23969079_11.txt
+taskID:4, Writing the output to log file:	depthfirst_hybrid_19_23969079_4.txt
+taskID:14, Writing the output to log file:	depthfirst_hybrid_19_23969079_14.txt
+taskID:3, Number of processors available = 24
+taskID:3, Number of threads =              1
+taskID:0, Number of processors available = 24
+taskID:0, Number of threads =              1
+taskID:9, Number of processors available = 24
+taskID:9, Number of threads =              1
+taskID:16, Number of processors available = 24
+taskID:16, Number of threads =              1
+taskID:15, Number of processors available = 24
+taskID:15, Number of threads =              1
+taskID:17, Number of processors available = 24
+taskID:17, Number of threads =              1
+taskID:2, Number of processors available = 24
+taskID:2, Number of threads =              1
+taskID:5, Number of processors available = 24
+taskID:5, Number of threads =              1
+taskID:1, Number of processors available = 24
+taskID:1, Number of threads =              1
+taskID:7, Number of processors available = 24
+taskID:7, Number of threads =              1
+taskID:8, Number of processors available = 24
+taskID:8, Number of threads =              1
+taskID:10, Number of processors available = 24
+taskID:10, Number of threads =              1
+taskID:11, Number of processors available = 24
+taskID:11, Number of threads =              1
+taskID:14, Number of processors available = 24
+taskID:14, Number of threads =              1
+taskID:13, Number of processors available = 24
+taskID:13, Number of threads =              1
+taskID:12, Number of processors available = 24
+taskID:12, Number of threads =              1
+taskID:4, Number of processors available = 24
+taskID:4, Number of threads =              1
+taskID:6, Number of processors available = 24
+taskID:6, Number of threads =              1
+taskID:1, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:3, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:4, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:5, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:8, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:9, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:11, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:12, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:14, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:6, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:13, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:15, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:0, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:17, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:10, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:16, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:2, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:7, totalNumThreads:1, numStartingThreads:1, numInitialPaths:1, pathsPerThread:1
+taskID:11, Evaluated a total of 6044 feasible complete paths.
+taskID:15, Evaluated a total of 77202 feasible complete paths.
+taskID:9, Evaluated a total of 205931 feasible complete paths.
+taskID:16, Evaluated a total of 319324 feasible complete paths.
+taskID:7, Evaluated a total of 639258 feasible complete paths.
+taskID:6, Evaluated a total of 394048 feasible complete paths.
+taskID:8, Evaluated a total of 246850 feasible complete paths.
+taskID:12, Evaluated a total of 9102 feasible complete paths.
+taskID:1, Evaluated a total of 4000 feasible complete paths.
+taskID:14, Evaluated a total of 50878 feasible complete paths.
+taskID:2, Evaluated a total of 33188 feasible complete paths.
+taskID:3, Evaluated a total of 10204 feasible complete paths.
+taskID:17, Evaluated a total of 686197 feasible complete paths.
+taskID:0, Evaluated a total of 2163 feasible complete paths.
+taskID:10, Evaluated a total of 50485 feasible complete paths.
+taskID:5, Evaluated a total of 681656 feasible complete paths.
+taskID:4, Evaluated a total of 1013097 feasible complete paths.
+taskID:13, Evaluated a total of 35063 feasible complete paths.
+Lowest Cost:622.00
+Wallclock time = 55955.134181
+
+Took 55871.1300000000 seconds to execute

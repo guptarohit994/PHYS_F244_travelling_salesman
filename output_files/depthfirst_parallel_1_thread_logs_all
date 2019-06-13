@@ -1,0 +1,48 @@
+Mon Jun 10 19:10:45 PDT 2019
+cities=5
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:4, pathsPerThread:4 Evaluated a total of 11 feasible complete paths. Lowest Cost:19.00 Wallclock time = 0.000053 Took 0.0000000000 seconds to execute
+------------------
+Mon Jun 10 19:10:45 PDT 2019
+cities=6
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:5, pathsPerThread:5 Evaluated a total of 112 feasible complete paths. Lowest Cost:291.00 Wallclock time = 0.000262 Took 0.0000000000 seconds to execute
+------------------
+Mon Jun 10 19:10:45 PDT 2019
+cities=7
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:6, pathsPerThread:6 Evaluated a total of 575 feasible complete paths. Lowest Cost:343.00 Wallclock time = 0.001401 Took 0.0000000000 seconds to execute
+------------------
+Mon Jun 10 19:10:45 PDT 2019
+cities=8
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:7, pathsPerThread:7 Evaluated a total of 2077 feasible complete paths. Lowest Cost:391.00 Wallclock time = 0.008542 Took 0.0000000000 seconds to execute
+------------------
+Mon Jun 10 19:10:45 PDT 2019
+cities=9
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:8, pathsPerThread:8 Evaluated a total of 4724 feasible complete paths. Lowest Cost:401.00 Wallclock time = 0.045549 Took 0.0400000000 seconds to execute
+------------------
+Mon Jun 10 19:10:45 PDT 2019
+cities=10
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:9, pathsPerThread:9 Evaluated a total of 8241 feasible complete paths. Lowest Cost:413.00 Wallclock time = 0.215348 Took 0.2100000000 seconds to execute
+------------------
+Mon Jun 10 19:10:45 PDT 2019
+cities=5
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:10, pathsPerThread:10 Evaluated a total of 62599 feasible complete paths. Lowest Cost:253.00 Wallclock time = 2.393531 Took 2.3900000000 seconds to execute
+------------------
+Mon Jun 10 19:10:48 PDT 2019
+cities=12
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:11, pathsPerThread:11 Evaluated a total of 19116 feasible complete paths. Lowest Cost:441.00 Wallclock time = 3.803033 Took 3.8000000000 seconds to execute
+------------------
+Mon Jun 10 19:10:52 PDT 2019
+cities=13
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:12, pathsPerThread:12 Evaluated a total of 25078 feasible complete paths. Lowest Cost:445.00 Wallclock time = 16.892092 Took 16.9000000000 seconds to execute
+------------------
+Mon Jun 10 19:11:08 PDT 2019
+cities=14
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:13, pathsPerThread:13 Evaluated a total of 86455 feasible complete paths. Lowest Cost:472.00 Wallclock time = 131.425222 Took 131.5400000000 seconds to execute
+------------------
+Mon Jun 10 19:13:20 PDT 2019
+cities=15
+Writing the output to log file: ./depthfirst_parallel_out.txt Number of processors available = 24 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:14, pathsPerThread:14 Evaluated a total of 3056 feasible complete paths. Lowest Cost:291.00 Wallclock time = 145.449833 Took 145.5800000000 seconds to execute
+------------------
+cities=16
+Writing the output to log file:	./depthfirst_parallel_out.txt Number of processors available = 1 Number of threads = 1 totalNumThreads:1, numStartingThreads:1, numInitialPaths:15, pathsPerThread:15 Evaluated a total of 1106655 feasible complete paths. Lowest Cost:527.00 Wallclock time = 8503.010179 Took 8501.2300000000 seconds to execute
+------------------
+cities=17

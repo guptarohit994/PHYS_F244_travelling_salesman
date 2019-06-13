@@ -1,0 +1,9 @@
+Writing the output to log file:	./depthfirst_parallel_out.txt
+Number of processors available = 1
+Number of threads =              1
+totalNumThreads:1, numStartingThreads:1, numInitialPaths:16, pathsPerThread:16
+Evaluated a total of 382272 feasible complete paths.
+Lowest Cost:2085.00
+Wallclock time = 51638.329853
+
+Took 51537.6100000000 seconds to execute

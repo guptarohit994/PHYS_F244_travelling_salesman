@@ -1,0 +1,9 @@
+Currently in /oasis/projects/nsf/csd453/r4gupta/test_10june/PHY_F244_travelling_salesman
+Using slurm job id 23960652
+
+Running dataset with 14 cities and dataset is at ./datasets/fri14_d.txt
+
+threads	       	Av time (in seconds)    Speedup over serial (times)
+===================================================================
+1	    	130.514798	  	1.00
+===================================================================

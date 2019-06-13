@@ -49,7 +49,7 @@ then
 elif [ $CITIES -eq 17 ]
 then
     DATASET_PATH="./datasets/gr17_d.txt"
-elif [[ ( $CITIES -gt 17 ) && ( $CITIES -lt 19 ) ]]
+elif [[ ( $CITIES -gt 17 ) && ( $CITIES -lt 21 ) ]]
 then
     DATASET_PATH="./datasets/fri${CITIES}_d.txt"
 fi
