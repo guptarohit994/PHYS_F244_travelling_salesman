@@ -74,12 +74,12 @@ ibrun --npernode 4 ./depthfirst_hybrid --dataset=./datasets/five_d.txt --cities=
 
 The above script runs 5 city dataset on 1 NODE with 4 MPI TASKS and 1 OMP THREAD each.
 This particular dataset can be run with either - 
-	* --nodes=1, --ntasks-per-node=4, OMP_NUM_THREADS=1
-	* --nodes=1, --ntasks-per-node=6, OMP_NUM_THREADS=2
-	* --nodes=1, --ntasks-per-node=1, OMP_NUM_THREADS=2
-	* --nodes=1, --ntasks-per-node=4, OMP_NUM_THREADS=4
+* --nodes=1, --ntasks-per-node=4, OMP_NUM_THREADS=1
+* --nodes=1, --ntasks-per-node=6, OMP_NUM_THREADS=2
+* --nodes=1, --ntasks-per-node=1, OMP_NUM_THREADS=2
+* --nodes=1, --ntasks-per-node=4, OMP_NUM_THREADS=4
 
-And like wise for other dataset. To get the batch scripts of all combinations automatically generated, use the below script with `--dryrun 1`
+And like wise for other datasets. To get the batch scripts of all combinations automatically generated, use the below script with `--dryrun 1`
 
 ### Sample command line for running the hybrid algorithm with different configurations
 
@@ -106,7 +106,7 @@ optional arguments:
 
 Note - This script needs to be run on an interactive or compute node (with ntask=1).
 
-	* Option 1 - Interactive node
+#### Option 1 - Interactive node
 
 ```bash
 # To go to interactive node
@@ -116,7 +116,7 @@ module load python/2.7.10
 python3 regress_hybrid.py --executable depthfirst_hybrid --cities 5
 ```
 
-	* Option 2 - run using non-interactive method. 
+#### Option 2 - run using non-interactive method. 
 	Use the following batch script
 ```bash
 #!/bin/bash
